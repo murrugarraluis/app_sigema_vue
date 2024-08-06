@@ -4,7 +4,6 @@ import AuthService from '@/service/AuthService';
 
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 
 const email = ref('');
 const password = ref('');
@@ -16,7 +15,6 @@ const invalidCredential = ref(false);
 const authService = new AuthService();
 
 const router = useRouter();
-const i18n = useI18n();
 
 function login() {
     submitted.value = true;
@@ -32,10 +30,6 @@ function login() {
             // TODO: SET DATA
             authService.setUserLogged({ ...data.data });
             authService.setToken(data.token);
-
-            const user = JSON.parse(localStorage.getItem('userLogged'));
-            const { native_language } = user.employee;
-            i18n.locale = native_language === 'spanish' ? 'es' : 'en';
             router.push({ name: 'dashboard' });
         } else {
             invalidCredential.value = true;

@@ -1,13 +1,16 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppTopbar from './AppTopbar.vue';
+import i18n from '@/locales/i18n';
+import { useI18n } from 'vue-i18n';
 
 const { layoutConfig, layoutState, isSidebarActive, resetMenu } = useLayout();
 
 const outsideClickListener = ref(null);
+const { locale } = useI18n();
 
 watch(isSidebarActive, (newVal) => {
     if (newVal) {
@@ -51,6 +54,18 @@ function isOutsideClicked(event) {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 }
+const setLenguaje = () => {
+    const user = JSON.parse(localStorage.getItem('userLogged'));
+    const { native_language } = user.employee;
+    const lang = native_language === 'spanish' ? 'es' : 'en';
+    switchLanguage(lang);
+};
+const switchLanguage = (lang) => {
+    locale.value = lang;
+};
+onMounted(() => {
+    setLenguaje();
+});
 </script>
 
 <template>
