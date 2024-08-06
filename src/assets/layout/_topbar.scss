@@ -68,6 +68,10 @@
             background-color: var(--primary-color);
             color: var(--primary-contrast-color);
         }
+        &.layout-topbar-action-signout{
+            background-color: rgb(190 18 60);
+            color: white;
+        }
     }
 
     .layout-menu-button {
