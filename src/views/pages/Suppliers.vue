@@ -279,10 +279,9 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
@@ -306,246 +305,240 @@ export default {
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suppliers"
-                    responsiveLayout="scroll"
                     :loading="loadingSuppliers"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('suppliers') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('suppliers') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
 
                     <Column field="document_type.name" :header="$t('document_type')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Document Type</span>
                             {{ slotProps.data.document_type.name }}
                         </template>
                     </Column>
                     <Column field="document_number" :header="$t('document_number')" :sortable="true" headerStyle="width:10%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Document Number</span>
                             {{ slotProps.data.document_number }}
                         </template>
                     </Column>
 
                     <Column field="name" :header="$t('business_name')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
                     <Column field="email" :header="$t('email')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Email</span>
                             {{ slotProps.data.email }}
                         </template>
                     </Column>
                     <Column field="phone" :header="$t('telephone')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Telephone</span>
                             {{ slotProps.data.phone }}
                         </template>
                     </Column>
                     <Column field="address" :header="$t('address')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Address</span>
                             {{ slotProps.data.address }}
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" @click="viewSupplier(slotProps.data)" />
-                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2" @click="editSupplier(slotProps.data)" />
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="confirmDelete(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewSupplier(slotProps.data)" />
+                                <Button outlined rounded severity="warn" icon="pi pi-pencil" class="mr-2" @click="editSupplier(slotProps.data)" />
+                                <Button outlined rounded severity="danger" icon="pi pi-trash" class="" @click="confirmDelete(slotProps.data)" />
                             </div>
                         </template>
                     </Column>
                 </DataTable>
 
                 <Dialog v-model:visible="supplierDialog" :style="{ width: '700px' }" :header="!supplier.id ? $t('new_supplier') : !isView ? $t('edit_supplier') : $t('inf_supplier')" :modal="true" class="p-fluid">
-                    <!--  <div class="formgrid grid">-->
-
-                    <div class="formgrid grid">
-                        <div class="field col">
-                            <label for="documentType">{{ $t('document_type') }}</label>
-                            <Dropdown
-                                id="documentType"
-                                v-model="supplier.document_type"
-                                :options="documentTypeItems"
-                                optionLabel="name"
-                                :placeholder="$t('select_one')"
-                                :filter="false"
-                                :loading="false"
-                                :class="{ 'p-invalid': submitted && !supplier.document_type }"
-                                :disabled="isView"
-                                autocomplete="off"
-                            ></Dropdown>
-                            <small class="p-invalid" v-if="submitted && !supplier.document_type">{{ $t('document_type_alert') }}</small>
-                        </div>
-                        <div class="field col">
-                            <label for="ruc">{{ $t('document_number') }}</label>
-                            <InputText
-                                id="ruc"
-                                v-model.trim="supplier.document_number"
-                                required="true"
-                                autofocus
-                                :class="{
-                                    'p-invalid': (submitted && !supplier.document_number) || (submitted && supplier.document_number.length < 8)
-                                }"
-                                :readonly="isView"
-                                autocomplete="off"
-                                @keypress="isNumber($event)"
-                            />
-                            <small class="p-invalid" v-if="submitted && !supplier.document_number">{{ $t('document_number_alert_one') }}</small>
-                            <br />
-                            <small class="p-invalid" v-if="submitted && supplier.document_number && supplier.document_number.length < 8">{{ $t('document_number_alert_two') }}</small>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label for="businessName">{{ $t('business_name') }}</label>
-                        <InputText id="businessName" v-model.trim="supplier.name" required="true" autofocus :class="{ 'p-invalid': submitted && !supplier.name }" :readonly="isView" autocomplete="off" />
-                        <small class="p-invalid" v-if="submitted && !supplier.name">{{ $t('business_name_alert') }}</small>
-                    </div>
-
-                    <!-- </div> -->
-
-                    <div class="formgrid grid">
-                        <div class="field col">
-                            <label for="telephone">{{ $t('telephone') }}</label>
-                            <InputText
-                                id="telephone"
-                                v-model.trim="supplier.phone"
-                                required="true"
-                                autofocus
-                                :class="{
-                                    'p-invalid': (submitted && !supplier.phone) || (submitted && supplier.phone.length < 9)
-                                }"
-                                :readonly="isView"
-                                autocomplete="off"
-                                @keypress="isNumber($event)"
-                            />
-                            <small class="p-invalid" v-if="submitted && !supplier.phone">{{ $t('telephone_alert_one') }}</small>
-                            <br />
-                            <small class="p-invalid" v-if="submitted && supplier.phone && supplier.phone.length < 9">{{ $t('telephone_alert_two') }}</small>
-                        </div>
-
-                        <div class="field col">
-                            <label for="email">{{ $t('email') }}</label>
-                            <InputText
-                                id="email"
-                                v-model.trim="supplier.email"
-                                required="true"
-                                autofocus
-                                :class="{
-                                    'p-invalid': (submitted && !supplier.email) || (submitted && !isEmail())
-                                }"
-                                :readonly="isView"
-                                autocomplete="off"
-                            />
-                            <small class="p-invalid" v-if="submitted && !supplier.email">{{ $t('email_alert_one') }}</small>
-                            <small class="p-invalid" v-if="submitted && supplier.email && !isEmail()">{{ $t('email_alert_two') }}</small>
-                        </div>
-                    </div>
-
-                    <div class="formgrid grid">
-                        <div class="field col-8">
-                            <label for="address">{{ $t('address') }}</label>
-                            <InputText id="address" v-model.trim="supplier.address" required="true" autofocus :class="{ 'p-invalid': submitted && !supplier.address }" :readonly="isView" autocomplete="off" />
-                            <small class="p-invalid" v-if="submitted && !supplier.address">{{ $t('address_alert') }}</small>
-                        </div>
-                        <div class="field col-4">
-                            <label for="supplierType">{{ $t('supplier_type') }}</label>
-                            <Dropdown
-                                id="supplierType"
-                                v-model="supplier.supplier_type"
-                                :options="supplierTypeItems"
-                                optionLabel="name"
-                                :placeholder="$t('select_one')"
-                                :filter="false"
-                                :loading="false"
-                                :class="{ 'p-invalid': submitted && !supplier.supplier_type }"
-                                :disabled="isView"
-                                autocomplete="off"
-                            ></Dropdown>
-                            <small class="p-invalid" v-if="submitted && !supplier.supplier_type">{{ $t('supplier_type_alert') }}</small>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div v-if="!isView" class="formgrid grid">
-                            <div class="field col-4">
-                                <label for="bankingEntity">{{ $t('banking_entity') }}</label>
+                    <div class="flex flex-col gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="lg:col-span-2">
+                                <label for="documentType">{{ $t('document_type') }}</label>
                                 <Dropdown
-                                    id="bankingEntity"
-                                    v-model="bankItem"
-                                    :options="bankItems"
+                                    id="documentType"
+                                    v-model="supplier.document_type"
+                                    :options="documentTypeItems"
                                     optionLabel="name"
                                     :placeholder="$t('select_one')"
                                     :filter="false"
                                     :loading="false"
-                                    :class="{ 'p-invalid': submittedAddBank && !bankItem }"
+                                    :class="{ 'p-invalid': submitted && !supplier.document_type }"
+                                    :disabled="isView"
                                     autocomplete="off"
+                                    fluid
                                 ></Dropdown>
-                                <small class="p-invalid" v-if="submittedAddBank && !bankItem">{{ $t('banking_entity_alert') }}</small>
+                                <small class="p-invalid" v-if="submitted && !supplier.document_type">{{ $t('document_type_alert') }}</small>
                             </div>
-
-                            <div class="field col-3">
-                                <label for="accountNumber">{{ $t('account_number') }}</label>
+                            <div>
+                                <label for="ruc">{{ $t('document_number') }}</label>
                                 <InputText
-                                    id="accountNumber"
-                                    v-model.trim="bank.account_number"
+                                    id="ruc"
+                                    v-model.trim="supplier.document_number"
                                     required="true"
                                     autofocus
                                     :class="{
-                                        'p-invalid': submittedAddBank && !bank.account_number
+                                        'p-invalid': (submitted && !supplier.document_number) || (submitted && supplier.document_number.length < 8)
                                     }"
+                                    :readonly="isView"
                                     autocomplete="off"
-                                    @keypress="isNumberBank($event)"
+                                    @keypress="isNumber($event)"
+                                    fluid
                                 />
-                                <small class="p-invalid" v-if="submittedAddBank && !bank.account_number">{{ $t('account_number_alert') }}</small>
+                                <small class="p-invalid" v-if="submitted && !supplier.document_number">{{ $t('document_number_alert_one') }}</small>
+                                <br />
+                                <small class="p-invalid" v-if="submitted && supplier.document_number && supplier.document_number.length < 8">{{ $t('document_number_alert_two') }}</small>
                             </div>
-
-                            <div class="field col-4">
-                                <label for="interbankCode">{{ $t('interbank_code') }}</label>
+                            <div class="md:col-span-2 lg:col-span-3">
+                                <label for="businessName">{{ $t('business_name') }}</label>
+                                <InputText id="businessName" v-model.trim="supplier.name" required="true" autofocus :class="{ 'p-invalid': submitted && !supplier.name }" :readonly="isView" autocomplete="off" fluid />
+                                <small class="p-invalid" v-if="submitted && !supplier.name">{{ $t('business_name_alert') }}</small>
+                            </div>
+                            <div class="md:col-span-2 lg:col-span-3">
+                                <label for="address">{{ $t('address') }}</label>
+                                <InputText id="address" v-model.trim="supplier.address" required="true" autofocus :class="{ 'p-invalid': submitted && !supplier.address }" :readonly="isView" autocomplete="off" fluid />
+                                <small class="p-invalid" v-if="submitted && !supplier.address">{{ $t('address_alert') }}</small>
+                            </div>
+                            <div>
+                                <label for="telephone">{{ $t('telephone') }}</label>
                                 <InputText
-                                    id="interbankCode"
-                                    v-model.trim="bank.interbank_account_number"
+                                    id="telephone"
+                                    v-model.trim="supplier.phone"
                                     required="true"
                                     autofocus
                                     :class="{
-                                        'p-invalid': submittedAddBank && !bank.interbank_account_number
+                                        'p-invalid': (submitted && !supplier.phone) || (submitted && supplier.phone.length < 9)
                                     }"
+                                    :readonly="isView"
                                     autocomplete="off"
-                                    @keypress="isNumberBank($event)"
+                                    @keypress="isNumber($event)"
+                                    fluid
                                 />
-                                <small class="p-invalid" v-if="submittedAddBank && !bank.interbank_account_number">{{ $t('interbank_code_alert') }}</small>
+                                <small class="p-invalid" v-if="submitted && !supplier.phone">{{ $t('telephone_alert_one') }}</small>
+                                <br />
+                                <small class="p-invalid" v-if="submitted && supplier.phone && supplier.phone.length < 9">{{ $t('telephone_alert_two') }}</small>
                             </div>
-
-                            <div class="field col-1 flex justify-content-center align-items-center">
-                                <Button icon="pi pi-plus" class="p-button-secondary" style="margin-top: 1.85rem" @click="addBank"></Button>
+                            <div>
+                                <label for="email">{{ $t('email') }}</label>
+                                <InputText
+                                    id="email"
+                                    v-model.trim="supplier.email"
+                                    required="true"
+                                    autofocus
+                                    :class="{
+                                        'p-invalid': (submitted && !supplier.email) || (submitted && !isEmail())
+                                    }"
+                                    :readonly="isView"
+                                    autocomplete="off"
+                                    fluid
+                                />
+                                <small class="p-invalid" v-if="submitted && !supplier.email">{{ $t('email_alert_one') }}</small>
+                                <small class="p-invalid" v-if="submitted && supplier.email && !isEmail()">{{ $t('email_alert_two') }}</small>
+                            </div>
+                            <div>
+                                <label for="supplierType">{{ $t('supplier_type') }}</label>
+                                <Dropdown
+                                    id="supplierType"
+                                    v-model="supplier.supplier_type"
+                                    :options="supplierTypeItems"
+                                    optionLabel="name"
+                                    :placeholder="$t('select_one')"
+                                    :filter="false"
+                                    :loading="false"
+                                    :class="{ 'p-invalid': submitted && !supplier.supplier_type }"
+                                    :disabled="isView"
+                                    autocomplete="off"
+                                    fluid
+                                ></Dropdown>
+                                <small class="p-invalid" v-if="submitted && !supplier.supplier_type">{{ $t('supplier_type_alert') }}</small>
                             </div>
                         </div>
+                        <Divider />
+                        <div class="flex flex-col gap-4">
+                            <div v-if="!isView" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="col-span-1">
+                                    <label for="bankingEntity">{{ $t('banking_entity') }}</label>
+                                    <Dropdown
+                                        id="bankingEntity"
+                                        v-model="bankItem"
+                                        :options="bankItems"
+                                        optionLabel="name"
+                                        :placeholder="$t('select_one')"
+                                        :filter="false"
+                                        :loading="false"
+                                        :class="{ 'p-invalid': submittedAddBank && !bankItem }"
+                                        autocomplete="off"
+                                        fluid
+                                    ></Dropdown>
+                                    <small class="p-invalid" v-if="submittedAddBank && !bankItem">{{ $t('banking_entity_alert') }}</small>
+                                </div>
 
-                        <div class="card">
-                            <DataTable :value="supplier.banks" responsiveLayout="scroll">
-                                <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field" style="width: 30%"> </Column>
+                                <div class="col-span-1 col-end-2">
+                                    <label for="accountNumber">{{ $t('account_number') }}</label>
+                                    <InputText
+                                        id="accountNumber"
+                                        v-model.trim="bank.account_number"
+                                        required="true"
+                                        autofocus
+                                        :class="{
+                                            'p-invalid': submittedAddBank && !bank.account_number
+                                        }"
+                                        autocomplete="off"
+                                        @keypress="isNumberBank($event)"
+                                        fluid
+                                    />
+                                    <small class="p-invalid" v-if="submittedAddBank && !bank.account_number">{{ $t('account_number_alert') }}</small>
+                                </div>
 
-                                <Column v-if="!isView" headerStyle="min-width:3rem;">
-                                    <template #body="slotProps">
-                                        <div style="display: flex; justify-content: end">
-                                            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="removeBank(slotProps.data)" />
-                                        </div>
-                                    </template>
-                                </Column>
-                            </DataTable>
+                                <div>
+                                    <label for="interbankCode">{{ $t('interbank_code') }}</label>
+                                    <div>
+                                        <InputGroup>
+                                            <InputText
+                                                id="interbankCode"
+                                                v-model.trim="bank.interbank_account_number"
+                                                required="true"
+                                                autofocus
+                                                :class="{
+                                                    'p-invalid': submittedAddBank && !bank.interbank_account_number
+                                                }"
+                                                autocomplete="off"
+                                                @keypress="isNumberBank($event)"
+                                                fluid
+                                            />
+                                            <Button icon="pi pi-plus" severity="primary" @click="addBank"></Button>
+                                        </InputGroup>
+                                    </div>
+                                    <small class="p-invalid" v-if="submittedAddBank && !bank.interbank_account_number">{{ $t('interbank_code_alert') }}</small>
+                                </div>
+                            </div>
+
+                            <div>
+                                <DataTable :value="supplier.banks" responsiveLayout="scroll">
+                                    <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field" style="width: 30%"> </Column>
+
+                                    <Column v-if="!isView" headerStyle="min-width:3rem;">
+                                        <template #body="slotProps">
+                                            <div style="display: flex; justify-content: end">
+                                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" outlined @click="removeBank(slotProps.data)" />
+                                            </div>
+                                        </template>
+                                    </Column>
+                                </DataTable>
+                            </div>
                         </div>
                     </div>
-
                     <template #footer>
                         <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
                         <Button v-if="!isView" :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
@@ -561,19 +554,8 @@ export default {
                         >
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteSupplierDialog = false" />
-                        <Button :label="$t('yes')" icon="pi pi-check" class="p-button-text" @click="deleteSupplier" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected suppliers?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />
+                        <Button label="No" icon="pi pi-times" class="" severity="secondary" outlined @click="deleteSupplierDialog = false" />
+                        <Button :label="$t('yes')" icon="pi pi-check" class="" severity="danger" @click="deleteSupplier" />
                     </template>
                 </Dialog>
             </div>

@@ -543,7 +543,7 @@ export default {
                                 <Textarea id="recommendation" v-model.trim="machine.recommendation" required="true" autofocus rows="4" :invalid="submitted && !machine.recommendation" :readonly="isView" autocomplete="off" fluid />
                                 <small class="p-invalid" v-if="submitted && !machine.recommendation">{{ $t('recommendation_of_use_alert') }}</small>
                             </div>
-
+                            <Divider />
                             <div v-if="!isView">
                                 <label for="sparePart" class="block font-bold mb-3">{{ $t('spare_part') }}</label>
                                 <div>

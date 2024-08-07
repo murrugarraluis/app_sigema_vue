@@ -70,6 +70,17 @@ export default {
         });
     },
     methods: {
+        getStatusLabel(status) {
+            switch (status) {
+                case 'Admin':
+                    return 'success';
+
+                case 'Employee':
+                    return 'info';
+                default:
+                    return 'warn';
+            }
+        },
         formatCurrency(value) {
             if (value)
                 return value.toLocaleString('en-US', {
@@ -311,7 +322,7 @@ export default {
                     </Column>
                     <Column field="roles" :header="$t('role')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            {{ slotProps.data.roles.length > 0 ? slotProps.data.roles[0].name : 'Without role' }}
+                            <Tag :value="$t(slotProps.data?.roles[0]?.name || 'Without role')" :severity="getStatusLabel(slotProps.data?.roles[0]?.name || 'Without role')" />
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;">
