@@ -478,7 +478,7 @@ export default {
                 </template>
             </Dialog>
             <Dialog v-model:visible="productDialog" :style="{ width: '950px' }" :header="!machine.id ? $t('new_machine') : !isView ? $t('edit_machine') : $t('inf_machine')" :modal="true">
-                <div class="grid grid-cols-2 gap-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div class="col">
                         <div class="flex flex-col gap-4">
                             <div>
@@ -592,7 +592,7 @@ export default {
                                         id="blah"
                                         :src="!this.machine.image ? imageDefault : isFile(this.machine.image) ? getImageObjectUrl(this.machine.image) : getImage(this.machine.image)"
                                         :alt="this.machine.name"
-                                        style="width: 100%; height: 300px; max-width: 450px"
+                                        style="width: 100%; height: 300px; max-width: 450px; margin: 0 auto"
                                     />
                                 </div>
                                 <div v-if="!isView" class="w-full">
