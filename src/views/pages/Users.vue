@@ -252,19 +252,17 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
-                    <template v-slot:start>
+                    <template #start>
                         <div class="my-2">
                             <Button :label="$t('new')" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
-                            <!--              <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />-->
                         </div>
                     </template>
 
-                    <template v-slot:end>
+                    <template #end>
                         <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
                     </template>
                 </Toolbar>
@@ -280,145 +278,100 @@ export default {
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
-                    responsiveLayout="scroll"
                     :loading="loadingUsers"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('users') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('users') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
 
-                    <!--          <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>-->
                     <Column field="employee.name" :header="$t('names')" :sortable="true" headerStyle="width:18%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
                             {{ slotProps.data.employee ? slotProps.data.employee.name : ' ' }}
                         </template>
                     </Column>
 
                     <Column field="employee.lastname" :header="$t('last_names')" :sortable="true" headerStyle="width:18%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Last Name</span>
                             {{ slotProps.data.employee ? slotProps.data.employee.lastname : ' ' }}
                         </template>
                     </Column>
 
                     <Column field="email" :header="$t('user')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">User</span>
                             {{ slotProps.data.email }}
                         </template>
                     </Column>
                     <Column field="roles" :header="$t('role')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <!--            TODO:COLOR ROLE WITH DINAMIC VALUE-->
                         <template #body="slotProps">
-                            <span class="p-column-title">Role</span>
                             {{ slotProps.data.roles.length > 0 ? slotProps.data.roles[0].name : 'Without role' }}
                         </template>
                     </Column>
-                    <!--          <Column field="status" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">-->
-                    <!--            <template #body="slotProps">-->
-                    <!--              <span class="p-column-title">Status</span>-->
-                    <!--              <span :class="'product-badge status-' + (slotProps.data.status ? slotProps.data.status.toLowerCase() : '')">{{slotProps.data.status}}</span>-->
-                    <!--            </template>-->
-                    <!--          </Column>-->
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2" @click="editProduct(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button outlined rounded severity="warn" icon="pi pi-pencil" class="mr-2" @click="editProduct(slotProps.data)" />
                                 <InputSwitch v-model="slotProps.data.isActive" @click="toggleLocked(slotProps.data)" />
-
-                                <!--                  <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="confirmDeleteProduct(slotProps.data)" />-->
                             </div>
                         </template>
                     </Column>
                 </DataTable>
-
-                <Dialog v-model:visible="productDialog" :style="{ width: '500px' }" :header="!user.id ? $t('new_user') : $t('edit_user')" :modal="true" class="p-fluid">
-                    <div class="field">
-                        <label for="employee" class="mb-3">{{ $t('employee') }}</label>
-                        <Dropdown
-                            id="employee"
-                            v-model="user.employee"
-                            :options="employeeItems"
-                            optionLabel="name"
-                            placeholder="Select One"
-                            :filter="true"
-                            :disabled="user.id"
-                            :loading="loadingEmployee"
-                            :class="{ 'p-invalid': submitted && !user.employee }"
-                        ></Dropdown>
-                        <small class="p-invalid" v-if="submitted && !user.employee">{{ $t('employee_alert') }}</small>
-                    </div>
-                    <div class="field">
-                        <label for="role" class="mb-3">{{ $t('role') }}</label>
-                        <Dropdown id="role" v-model="user.role" :options="roleItems" optionLabel="name" placeholder="Select One" :filter="false" :loading="loadingRole" :class="{ 'p-invalid': submitted && !user.role }"></Dropdown>
-                        <small class="p-invalid" v-if="submitted && !user.role">{{ $t('role_alert') }}</small>
-                    </div>
-                    <div class="formgrid grid">
-                        <div class="field col-12">
-                            <label for="user">{{ $t('user') }}</label>
-                            <InputText
-                                id="user"
-                                v-model.trim="user.email"
-                                required="true"
-                                readonly
-                                autofocus
-                                :class="{
-                                    'p-invalid': submitted && !user.email
-                                }"
-                            />
-                        </div>
-                        <div class="field col-12" v-show="false">
-                            <label for="password">Password</label>
-                            <InputText
-                                id="password"
-                                v-model.trim="user.password"
-                                required="true"
-                                disabled
-                                autofocus
-                                :class="{
-                                    'p-invalid': submitted && !user.password
-                                }"
-                            />
-                        </div>
-                    </div>
-                    <template #footer>
-                        <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
-                        <Button :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product"
-                            >Are you sure you want to delete <b>{{ product.name }}</b
-                            >?</span
-                        >
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteProduct" />
-                    </template>
-                </Dialog>
-
-                <!--        <Dialog v-model:visible="deleteProductsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">-->
-                <!--          <div class="flex align-items-center justify-content-center">-->
-                <!--            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />-->
-                <!--            <span v-if="product">Are you sure you want to delete the selected products?</span>-->
-                <!--          </div>-->
-                <!--          <template #footer>-->
-                <!--            <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false"/>-->
-                <!--            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />-->
-                <!--          </template>-->
-                <!--        </Dialog>-->
             </div>
+            <Dialog v-model:visible="productDialog" :style="{ width: '500px' }" :header="!user.id ? $t('new_user') : $t('edit_user')" :modal="true" class="p-fluid">
+                <div class="flex flex-col gap-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="field">
+                            <label for="employee" class="block font-boldmb-3">{{ $t('employee') }}</label>
+                            <Dropdown
+                                id="employee"
+                                v-model="user.employee"
+                                :options="employeeItems"
+                                optionLabel="name"
+                                placeholder="Select One"
+                                :filter="true"
+                                :disabled="user.id"
+                                :loading="loadingEmployee"
+                                :class="{ 'p-invalid': submitted && !user.employee }"
+                                fluid
+                            ></Dropdown>
+                            <small class="p-invalid" v-if="submitted && !user.employee">{{ $t('employee_alert') }}</small>
+                        </div>
+                        <div class="field">
+                            <label for="role" class="block font-boldmb-3">{{ $t('role') }}</label>
+                            <Dropdown id="role" v-model="user.role" :options="roleItems" optionLabel="name" placeholder="Select One" :filter="false" :loading="loadingRole" :class="{ 'p-invalid': submitted && !user.role }" fluid></Dropdown>
+                            <small class="p-invalid" v-if="submitted && !user.role">{{ $t('role_alert') }}</small>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="user" class="block font-bold mb-3">{{ $t('user') }}</label>
+                        <InputText id="user" v-model.trim="user.email" required="true" readonly autofocus :invalid="submitted && !user.email" fluid />
+                    </div>
+                </div>
+                <template #footer>
+                    <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
+                    <Button :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
+                </template>
+            </Dialog>
+            <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                    <span v-if="product"
+                        >Are you sure you want to delete <b>{{ product.name }}</b
+                        >?</span
+                    >
+                </div>
+                <template #footer>
+                    <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false" />
+                    <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteProduct" />
+                </template>
+            </Dialog>
         </div>
     </div>
 </template>

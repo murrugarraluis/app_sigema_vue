@@ -396,7 +396,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex flex-wrap gap-2 items-center justify-between">
-                            <h5 class="m-0">{{ $t('machines') }}</h5>
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('machines') }}</h5>
                             <IconField>
                                 <InputIcon>
                                     <i class="pi pi-search" />
@@ -445,9 +445,6 @@ export default {
                         </template>
                     </Column>
                     <Column field="status" :header="$t('status')" :sortable="true" headerStyle="width:14%; min-width:8rem;">
-                        <!--                        <template #body="slotProps">-->
-                        <!--                            <span :class="'product-badge status-' + (slotProps.data.status === 'available' ? 'new' : slotProps.data.status === 'operating' ? 'instock' : 'outofstock')">{{ $t(slotProps.data.status) }}</span>-->
-                        <!--                        </template>-->
                         <template #body="slotProps">
                             <Tag :value="$t(slotProps.data.status)" :severity="getStatusLabel(slotProps.data.status)" />
                         </template>
@@ -455,7 +452,7 @@ export default {
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
+                            <div class="flex justify-end items-center">
                                 <Button outlined rounded severity="success" icon="pi pi-question" class="mr-2" @click="recommendationMachine(slotProps.data)" />
                                 <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewMachine(slotProps.data)" />
                                 <Button outlined rounded severity="warn" icon="pi pi-pencil" class="mr-2" @click="editProduct(slotProps.data)" />
