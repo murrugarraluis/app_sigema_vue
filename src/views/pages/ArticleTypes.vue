@@ -154,10 +154,9 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
@@ -185,36 +184,37 @@ export default {
                     :loading="loadingArticlesTypes"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('article_type') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('article_type') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
 
                     <Column field="name" :header="$t('name')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" @click="viewArticleTypes(slotProps.data)" />
-                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2" @click="editProduct(slotProps.data)" />
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="confirmDelete(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewArticleTypes(slotProps.data)" />
+                                <Button outlined rounded severity="warn" icon="pi pi-pencil" class="mr-2" @click="editProduct(slotProps.data)" />
+                                <Button outlined rounded severity="danger" icon="pi pi-trash" class="" @click="confirmDelete(slotProps.data)" />
                             </div>
                         </template>
                     </Column>
                 </DataTable>
 
                 <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" :header="!resource.id ? $t('new_article_type') : !isView ? $t('edit_article_type') : $t('inf_article_type')" :modal="true" class="p-fluid">
-                    <div class="field">
-                        <label for="name">{{ $t('name') }}</label>
-                        <InputText id="name" v-model.trim="resource.name" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !resource.name }" />
+                    <div>
+                        <label class="block font-bold mb-3" for="name">{{ $t('name') }}</label>
+                        <InputText id="name" v-model.trim="resource.name" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !resource.name }" fluid />
                         <small class="p-invalid" v-if="submitted && !resource.name">{{ $t('name_alert') }}</small>
                     </div>
                     <template #footer>
@@ -232,19 +232,8 @@ export default {
                         >
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button :label="$t('yes')" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected products?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />
+                        <Button label="No" icon="pi pi-times" class="" severity="secondary" outlined @click="deleteDialog = false" />
+                        <Button :label="$t('yes')" icon="pi pi-check" class="" severity="danger" @click="deleteResource" />
                     </template>
                 </Dialog>
             </div>
