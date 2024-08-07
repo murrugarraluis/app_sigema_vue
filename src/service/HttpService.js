@@ -1,4 +1,4 @@
-const apiHost = import.meta.env.VITE_APP_API_HOST;
+const apiHost = import.meta.env.VITE_APP_API_HOST + '/api/v1';
 export default class HttpService {
     async getAll(uri) {
         return await httpService(`${apiHost}/${uri}`, {

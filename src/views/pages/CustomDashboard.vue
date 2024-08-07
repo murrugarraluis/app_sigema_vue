@@ -58,7 +58,7 @@ onMounted(() => {
 
 <template>
     <div class="grid grid-cols-12 gap-8">
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageMachines">
@@ -78,7 +78,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_machines') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageWorkSheets">
@@ -98,7 +98,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_workSheets') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageMaintenancesSheets">
@@ -118,7 +118,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_maintenancesSheets') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageEmployees">
@@ -138,7 +138,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_employees') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageAttendancesSheets">
@@ -158,7 +158,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_attendanceSheets') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageSuppliers">
@@ -178,7 +178,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_suppliers') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageInventory">
@@ -198,7 +198,7 @@ onMounted(() => {
                 <span class="text-muted-color">{{ $t('d_n_inventory') }}</span>
             </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+        <div class="col-span-12 lg:col-span-6 xl:col-span-4">
             <div
                 class="card mb-0 cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105 flex flex-col h-full"
                 @click="pageUsers">
