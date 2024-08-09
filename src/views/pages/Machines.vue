@@ -475,8 +475,8 @@ export default {
                 </template>
             </Dialog>
             <Dialog v-model:visible="productDialog" :style="{ width: '950px' }" :header="!machine.id ? $t('new_machine') : !isView ? $t('edit_machine') : $t('inf_machine')" :modal="true">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div class="col">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+                    <div class="col-span-1 md:col-span-7">
                         <div class="flex flex-col gap-4">
                             <div>
                                 <label for="serie_number" class="block font-bold mb-3">{{ $t('serial_number') }}</label>
@@ -580,7 +580,7 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-span-1 md:col-span-5">
                         <div class="flex flex-col gap-4">
                             <div>
                                 <label class="block font-bold mb-3">{{ $t('image') }}</label>

@@ -385,17 +385,9 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
-        <div class="col-12">
-            <div class="card p-fluid">
-                <div class="flex flex-column align-items-center">
-                    <h3 class="text-900 font-medium">{{ $t('inventory') }}</h3>
-                </div>
-            </div>
-        </div>
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
@@ -407,7 +399,6 @@ export default {
                         <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
                     </template>
                 </Toolbar>
-
                 <DataTable
                     ref="dt"
                     :value="articles"
@@ -423,155 +414,149 @@ export default {
                     :loading="loadingArticles"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <div class="field col-12 sm:col-6">
-                                <h6 class="m-0">
-                                    {{ $t('filter_by') }}
-                                    <Dropdown
-                                        id="state"
-                                        v-model="filter"
-                                        :options="articleTypeFilterItems"
-                                        optionLabel="name"
-                                        :placeholder="$t('select_one')"
-                                        :filter="false"
-                                        :loading="loadingArticleTypesFilter"
-                                        @change="filterByArticleType"
-                                    ></Dropdown>
-                                </h6>
+                        <h5 class="font-bold text-xl text-primary m-0 mb-2">{{ $t('machines') }}</h5>
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <div class="flex justify-between items-center gap-4">
+                                <h6>{{ $t('filter_by') }}</h6>
+                                <Dropdown
+                                    id="state"
+                                    v-model="filter"
+                                    :options="articleTypeFilterItems"
+                                    optionLabel="name"
+                                    :placeholder="$t('select_one')"
+                                    :filter="false"
+                                    :loading="loadingArticleTypesFilter"
+                                    @change="filterByArticleType"
+                                    fluid
+                                ></Dropdown>
                             </div>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
                     <Column field="name" :header="$t('name')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
 
                     <Column field="serie_number" :header="$t('serial_number')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Serie Number</span>
                             {{ slotProps.data.serie_number }}
                         </template>
                     </Column>
                     <Column field="model" :header="$t('model')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Model</span>
                             {{ slotProps.data.model }}
                         </template>
                     </Column>
                     <Column field="brand" :header="$t('brand')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Brand</span>
                             {{ slotProps.data.brand }}
                         </template>
                     </Column>
                     <Column :header="$t('image')" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Image</span>
                             <img :src="slotProps.data.image ? getImage(slotProps.data.image) : imageDefault" :alt="'machine'" class="shadow-2" width="100" height="100" />
                         </template>
                     </Column>
                     <Column field="quantity" :header="$t('quantity')" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Quantity</span>
                             {{ slotProps.data.quantity }}
                         </template>
                     </Column>
 
                     <Column field="article_type.name" :header="$t('article_type')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Article Type</span>
                             {{ slotProps.data.article_type.name }}
                         </template>
                     </Column>
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" @click="viewArticles(slotProps.data)" />
-                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2" @click="editProduct(slotProps.data)" />
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="confirmDelete(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewArticles(slotProps.data)" />
+                                <Button outlined rounded severity="warn" icon="pi pi-pencil" class="mr-2" @click="editProduct(slotProps.data)" />
+                                <Button outlined rounded severity="danger" icon="pi pi-trash" class="" @click="confirmDelete(slotProps.data)" />
                             </div>
                         </template>
                     </Column>
                 </DataTable>
-
-                <Dialog v-model:visible="productDialog" :style="{ width: '1000px' }" :header="!article.id ? $t('new_article') : !isView ? $t('edit_article') : $t('inf_article')" :modal="true" class="p-fluid">
-                    <div class="formgrid grid">
-                        <div class="col-8">
-                            <div class="card mb-4">
-                                <div class="formgrid grid">
-                                    <div class="field col">
-                                        <label for="serialNumber">{{ $t('serial_number') }}</label>
-                                        <InputText
-                                            id="serialNumber"
-                                            v-model.trim="article.serie_number"
-                                            required="true"
-                                            :readonly="isView"
-                                            autofocus
-                                            :class="{
-                                                'p-invalid': submitted && !article.serie_number
-                                            }"
-                                        />
-                                        <small class="p-invalid" v-if="submitted && !article.serie_number">{{ $t('serial_number_alert') }}</small>
-                                    </div>
-
-                                    <div class="field col">
-                                        <label for="name">{{ $t('name') }}</label>
-                                        <InputText id="name" v-model.trim="article.name" required="true" autofocus :readonly="isView" autocomplete="off" :class="{ 'p-invalid': submitted && !article.name }" />
-                                        <small class="p-invalid" v-if="submitted && !article.name">{{ $t('name_alert') }}</small>
-                                    </div>
+            </div>
+            <Dialog v-model:visible="productDialog" :style="{ width: '1000px' }" :header="!article.id ? $t('new_article') : !isView ? $t('edit_article') : $t('inf_article')" :modal="true" class="p-fluid">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+                    <div class="col-span-1 md:col-span-7">
+                        <div class="flex flex-col gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="serialNumber" class="block font-bold mb-3">{{ $t('serial_number') }}</label>
+                                    <InputText
+                                        id="serialNumber"
+                                        v-model.trim="article.serie_number"
+                                        required="true"
+                                        :readonly="isView"
+                                        autofocus
+                                        :class="{
+                                            'p-invalid': submitted && !article.serie_number
+                                        }"
+                                        fluid
+                                    />
+                                    <small class="p-invalid" v-if="submitted && !article.serie_number">{{ $t('serial_number_alert') }}</small>
                                 </div>
-
-                                <div class="formgrid grid">
-                                    <div class="field col">
-                                        <label for="brand">{{ $t('brand') }}</label>
-                                        <InputText id="brand" v-model.trim="article.brand" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !article.brand }" />
-                                        <small class="p-invalid" v-if="submitted && !article.brand">{{ $t('brand_alert') }}</small>
-                                    </div>
-
-                                    <div class="field col">
-                                        <label for="model">{{ $t('model') }}</label>
-                                        <InputText id="model" v-model.trim="article.model" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !article.model }" />
-                                        <small class="p-invalid" v-if="submitted && !article.model">{{ $t('model_alert') }}</small>
-                                    </div>
-                                </div>
-
-                                <div class="formgrid grid">
-                                    <div class="field col">
-                                        <label for="quantity">{{ $t('quantity') }}</label>
-                                        <InputNumber id="quantity" v-model="article.quantity" showButtons :readonly="isView" :min="0" :useGrouping="false" :class="{ 'p-invalid': submitted && !article.quantity }" />
-                                        <small class="p-invalid" v-if="submitted && !article.quantity">{{ $t('quantity_alert') }}</small>
-                                    </div>
-
-                                    <div class="field col">
-                                        <label for="articleType">{{ $t('article_type') }}</label>
-                                        <Dropdown
-                                            id="articleType"
-                                            v-model="article.article_type"
-                                            :options="articleTypeItems"
-                                            optionLabel="name"
-                                            :placeholder="$t('select_one')"
-                                            :disabled="isView"
-                                            :filter="true"
-                                            :loading="loadingArticleTypes"
-                                            :class="{
-                                                'p-invalid': submitted && !article.article_type
-                                            }"
-                                        ></Dropdown>
-                                        <small class="p-invalid" v-if="submitted && !article.article_type">{{ $t('article_type_alert') }}</small>
-                                    </div>
+                                <div>
+                                    <label for="name" class="block font-bold mb-3">{{ $t('name') }}</label>
+                                    <InputText id="name" v-model.trim="article.name" required="true" autofocus :readonly="isView" autocomplete="off" :class="{ 'p-invalid': submitted && !article.name }" fluid />
+                                    <small class="p-invalid" v-if="submitted && !article.name">{{ $t('name_alert') }}</small>
                                 </div>
                             </div>
-                            <div class="card m-0">
-                                <div v-if="!isView" class="formgrid grid">
-                                    <div class="field col-7">
-                                        <label for="supplierRef">{{ $t('supplier') }}</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="brand" class="block font-bold mb-3">{{ $t('brand') }}</label>
+                                    <InputText id="brand" v-model.trim="article.brand" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !article.brand }" fluid />
+                                    <small class="p-invalid" v-if="submitted && !article.brand">{{ $t('brand_alert') }}</small>
+                                </div>
+
+                                <div>
+                                    <label for="model" class="block font-bold mb-3">{{ $t('model') }}</label>
+                                    <InputText id="model" v-model.trim="article.model" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !article.model }" fluid />
+                                    <small class="p-invalid" v-if="submitted && !article.model">{{ $t('model_alert') }}</small>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="quantity" class="block font-bold mb-3">{{ $t('quantity') }}</label>
+                                    <InputNumber id="quantity" v-model="article.quantity" showButtons :readonly="isView" :min="0" :useGrouping="false" :invalid="submitted && !article.quantity" fluid />
+                                    <small class="p-invalid" v-if="submitted && !article.quantity">{{ $t('quantity_alert') }}</small>
+                                </div>
+
+                                <div>
+                                    <label for="articleType" class="block font-bold mb-3">{{ $t('article_type') }}</label>
+                                    <Dropdown
+                                        id="articleType"
+                                        v-model="article.article_type"
+                                        :options="articleTypeItems"
+                                        optionLabel="name"
+                                        :placeholder="$t('select_one')"
+                                        :disabled="isView"
+                                        :filter="true"
+                                        :loading="loadingArticleTypes"
+                                        :class="{
+                                            'p-invalid': submitted && !article.article_type
+                                        }"
+                                        fluid
+                                    ></Dropdown>
+                                    <small class="p-invalid" v-if="submitted && !article.article_type">{{ $t('article_type_alert') }}</small>
+                                </div>
+                            </div>
+                            <Divider />
+                            <div v-if="!isView" class="formgrid grid">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                    <div class="col-span-1 md:col-span-8">
+                                        <label for="supplierRef" class="block font-bold mb-3">{{ $t('supplier') }}</label>
                                         <Dropdown
                                             id="supplierRef"
                                             v-model="supplierRefItem"
@@ -583,113 +568,94 @@ export default {
                                             :class="{
                                                 'p-invalid': submittedAddSuppliersRef && !supplierRefItem
                                             }"
+                                            fluid
                                         ></Dropdown>
                                         <small class="p-invalid" v-if="submittedAddSuppliersRef && !supplierRefItem">{{ $t('supplier_alert') }}</small>
                                     </div>
 
-                                    <div class="field col-3">
-                                        <label for="price">{{ $t('price') }}</label>
-                                        <InputNumber
-                                            id="price"
-                                            v-model="supplier_ref.price"
-                                            mode="currency"
-                                            currency="PEN"
-                                            locale="es-PE"
-                                            :class="{
-                                                'p-invalid': submittedAddSuppliersRef && !supplier_ref.price
-                                            }"
-                                        />
+                                    <div class="col-span-1 md:col-span-4">
+                                        <label for="price" class="block font-bold mb-3">{{ $t('price') }}</label>
+                                        <div>
+                                            <InputGroup>
+                                                <InputNumber id="price" v-model="supplier_ref.price" mode="currency" currency="PEN" locale="es-PE" :invalid="submittedAddSuppliersRef && !supplier_ref.price" fluid min="0" />
+                                                <Button icon="pi pi-plus" severity="primary" @click="addSpullierRef"></Button>
+                                            </InputGroup>
+                                        </div>
                                         <small class="p-invalid" v-if="submittedAddSuppliersRef && !supplier_ref.price">{{ $t('price_alert') }}</small>
                                     </div>
-                                    <div class="field col-2 flex justify-content-center align-items-center">
-                                        <Button icon="pi pi-plus" class="p-button-secondary" style="margin-top: 1.8rem" @click="addSpullierRef"></Button>
-                                    </div>
                                 </div>
-                                <div class="card">
-                                    <DataTable :value="article.suppliers" responsiveLayout="scroll">
-                                        <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field" style="width: 90%">
-                                            <template #editor="{ data, field }">
-                                                <InputNumber v-model="data[field]" mode="currency" currency="PEN" locale="es-PE" autofocus />
-                                            </template>
-                                        </Column>
+                                <div class="field col-2 flex justify-content-center align-items-center"></div>
+                            </div>
+                            <div>
+                                <DataTable :value="article.suppliers" responsiveLayout="scroll">
+                                    <Column v-for="col of columns" :field="col.field" :header="col.header" :key="col.field" style="width: 90%">
+                                        <template #editor="{ data, field }">
+                                            <InputNumber v-model="data[field]" mode="currency" currency="PEN" locale="es-PE" autofocus />
+                                        </template>
+                                    </Column>
 
-                                        <Column v-if="!isView" headerStyle="min-width:10rem;">
-                                            <template #body="slotProps">
-                                                <div style="display: flex; justify-content: end">
-                                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="removeSupplierRef(slotProps.data)" />
-                                                </div>
-                                            </template>
-                                        </Column>
-                                    </DataTable>
-                                </div>
+                                    <Column v-if="!isView" headerStyle="min-width:10rem;">
+                                        <template #body="slotProps">
+                                            <div style="display: flex; justify-content: end">
+                                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="removeSupplierRef(slotProps.data)" />
+                                            </div>
+                                        </template>
+                                    </Column>
+                                </DataTable>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="card w-full h-full m-0">
-                                <div class="mb-4">
-                                    <h5>{{ $t('image') }}</h5>
-                                    <div class="flex flex-column align-items-center justify-content-center">
-                                        <div class="mb-2">
-                                            <img
-                                                id="blah"
-                                                :disabled="isView"
-                                                :src="!this.article.image ? imageDefault : isFile(this.article.image) ? getImageObjectUrl(this.article.image) : getImage(this.article.image)"
-                                                alt="your image"
-                                                style="width: 100%; height: 300px; max-width: 450px"
-                                            />
-                                        </div>
-                                        <div v-if="!isView" class="w-full">
-                                            <FileUpload class="w-full" mode="basic" name="demo[]" url="./upload.php" accept="image/*" :disabled="isView" :maxFileSize="2000000" @input="onUploadImage" />
-                                        </div>
-                                    </div>
+                    </div>
+                    <div class="col-span-1 md:col-span-5">
+                        <div class="flex flex-col gap-4">
+                            <div class="">
+                                <label class="block font-bold mb-3">{{ $t('image') }}</label>
+                                <div class="mb-2">
+                                    <img
+                                        id="blah"
+                                        :disabled="isView"
+                                        :src="!this.article.image ? imageDefault : isFile(this.article.image) ? getImageObjectUrl(this.article.image) : getImage(this.article.image)"
+                                        alt="your image"
+                                        style="width: 100%; height: 300px; max-width: 450px"
+                                    />
                                 </div>
-                                <div class="">
-                                    <h5>{{ $t('technical_sheet') }}</h5>
-                                    <div v-if="article.id && isView && article.technical_sheet" class="w-full mb-2">
-                                        <Button :label="$t('view_pdf')" icon="pi pi-arrow-up-right" class="p-button-info mr-2" @click="viewPDF" />
-                                    </div>
-                                    <div v-if="article.id && isView && !article.technical_sheet" class="w-full mb-2">
-                                        <Message severity="info" :closable="false">{{ $t('without_pdf') }}</Message>
-                                    </div>
-                                    <div v-if="!isView" class="w-full">
-                                        <FileUpload class="w-full" mode="basic" accept="application/pdf" :disabled="isView" :maxFileSize="2000000" @input="onUploadFile" />
-                                    </div>
+                                <div v-if="!isView" class="w-full">
+                                    <FileUpload class="w-full" mode="basic" name="demo[]" url="./upload.php" accept="image/*" :disabled="isView" :maxFileSize="2000000" @input="onUploadImage" />
+                                </div>
+                            </div>
+                            <div class="">
+                                <label class="block font-bold mb-3">{{ $t('technical_sheet') }}</label>
+                                <div v-if="article.id && isView && article.technical_sheet" class="w-full mb-2">
+                                    <Button :label="$t('view_pdf')" icon="pi pi-arrow-up-right" class="p-button-info mr-2" @click="viewPDF" />
+                                </div>
+                                <div v-if="article.id && isView && !article.technical_sheet" class="w-full mb-2">
+                                    <Message severity="info" :closable="false">{{ $t('without_pdf') }}</Message>
+                                </div>
+                                <div v-if="!isView" class="w-full">
+                                    <FileUpload class="w-full" mode="basic" accept="application/pdf" :disabled="isView" :maxFileSize="2000000" @input="onUploadFile" />
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <template #footer>
-                        <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
-                        <Button v-if="!isView" :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" :header="$t('confirm')" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="resource"
-                            >{{ $t('delete') }} <b>{{ resource.name }}</b
-                            >?</span
-                        >
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected Articles?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />
-                    </template>
-                </Dialog>
-            </div>
+                <template #footer>
+                    <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
+                    <Button v-if="!isView" :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
+                </template>
+            </Dialog>
+            <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" :header="$t('confirm')" :modal="true">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                    <span v-if="resource"
+                        >{{ $t('delete') }} <b>{{ resource.name }}</b
+                        >?</span
+                    >
+                </div>
+                <template #footer>
+                    <Button label="No" icon="pi pi-times" class="" severity="secondary" outlined @click="deleteDialog = false" />
+                    <Button :label="$t('yes')" icon="pi pi-check" class="" severity="danger" @click="deleteResource" />
+                </template>
+            </Dialog>
         </div>
     </div>
 </template>
