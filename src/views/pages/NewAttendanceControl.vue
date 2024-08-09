@@ -2,6 +2,7 @@
 import { FilterMatchMode } from '@primevue/core/api';
 //import ProductService from "../service/ProductService";
 import AttendanceService from '@/service/AttendanceService';
+import moment from 'moment';
 
 export default {
     data() {
@@ -335,31 +336,23 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
+    <div>
         <div class="col-12">
-            <Button icon="pi pi-arrow-left" class="p-button-rounded mr-2 mb-2" @click="backPage" />
-            <div class="card p-fluid">
-                <div class="flex flex-column align-items-center">
-                    <h3 class="text-900 font-medium">{{ $t('assist_control') }}</h3>
-                </div>
+            <div class="col-12">
+                <Button icon="pi pi-arrow-left" class="p-button-rounded mr-2 mb-2" @click="backPage" />
             </div>
-        </div>
-        <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
-                        <div class="my-2">
-                            <Button :label="$t('check_in')" icon="pi pi-sign-in" class="p-button-success mr-2 mb-2" @click="checkIn" :disabled="disabledButtonCheckIn" />
-
-                            <Button :label="$t('check_out')" icon="pi pi-sign-out" class="p-button-danger mr-2 mb-2" @click="checkOut" :disabled="disabledButtonCheckOut" />
-
-                            <Button :label="$t('justify')" icon="pi pi-check-square" class="p-button-rounded p-button-warning mr-2 mb-2" @click="openJustify" />
+                        <div class="flex flex-row gap-4">
+                            <Button :label="$t('check_in')" icon="pi pi-sign-in" severity="success" @click="checkIn" :disabled="disabledButtonCheckIn" />
+                            <Button :label="$t('check_out')" icon="pi pi-sign-out" severity="danger" @click="checkOut" :disabled="disabledButtonCheckOut" />
+                            <Button :label="$t('justify')" icon="pi pi-check-square" severity="warn" @click="openJustify" />
                         </div>
                     </template>
 
                     <template v-slot:end>
-                        <Button :label="$t('close_record')" class="mr-2 mb-2" @click="closeSheet" :disabled="disabledButtonClose"></Button>
+                        <Button :label="$t('close_record')" severity="info" @click="closeSheet" :disabled="disabledButtonClose"></Button>
                     </template>
                 </Toolbar>
 
@@ -377,101 +370,70 @@ export default {
                     responsiveLayout="scroll"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('list') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('assist_control') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                    <Column field="name" :header="$t('names')" :sortable="true" headerStyle="width:21%; min-width:10rem;">
+                    <Column field="name" :header="$t('names')" :sortable="true" headerStyle="width:30%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
 
-                    <Column field="lastname" :header="$t('last_names')" :sortable="true" headerStyle="width:21%; min-width:10rem;">
+                    <Column field="lastname" :header="$t('last_names')" :sortable="true" headerStyle="width:30%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Last Name</span>
                             {{ slotProps.data.lastname }}
                         </template>
                     </Column>
 
                     <Column field="check_in" :header="$t('check_in_time')" :sortable="true" headerStyle="width:20%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Check in time</span>
                             {{ slotProps.data.check_in }}
                         </template>
                     </Column>
                     <Column field="check_out" :header="$t('check_out_time')" :sortable="true" headerStyle="width:20%; min-width:1rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Check out time</span>
                             {{ slotProps.data.check_out }}
                         </template>
                     </Column>
 
                     <Column field="status_working" header="Status" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
-
-                            <span
-                                :class="
-                                    'product-badge status-' +
-                                    (slotProps.data.status_working === 'started working' ? 'instock' : slotProps.data.status_working === 'justified absence' ? 'lowstock' : slotProps.data.status_working === 'finished work' ? 'new' : 'outofstock')
-                                "
-                                >{{ slotProps.data.status_working }}</span
-                            >
+                            <Tag
+                                :value="slotProps.data.status_working"
+                                :severity="(slotProps.data.status_working === 'started working' ? 'success' : slotProps.data.status_working === 'justified absence' ? 'warn' : slotProps.data.status_working === 'finished work' ? 'info' : 'danger')" />
                         </template>
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="justifyDialog" :style="{ width: '450px' }" :header="$t('justification')" :modal="true" class="p-fluid">
-                    <div class="field">
-                        <label for="name">{{ $t('reason') }}</label>
-                        <InputText id="name" v-model.trim="missedReason" required="true" autofocus :class="{ 'p-invalid': submitted && !missedReason }" />
+            </div>
+            <Dialog v-model:visible="justifyDialog" :style="{ width: '450px' }" :header="$t('justification')" :modal="true" class="p-fluid">
+                <div class="flex flex-col gap-4">
+                    <div>
+                        <label for="name" class="block font-bold" >{{ $t('reason') }}</label>
+                        <InputText id="name" v-model.trim="missedReason" required="true" autofocus :class="{ 'p-invalid': submitted && !missedReason }" fluid />
                         <small class="p-invalid" v-if="submitted && !missedReason">{{ $t('reason_alert') }}</small>
                     </div>
-                    <div class="field">
-                        <label for="name">{{ $t('description') }}</label>
-                        <Textarea id="name" v-model.trim="missedDescription" rows="5" :autoResize="true" required="true" autofocus :class="{ 'p-invalid': submitted && !missedDescription }" />
+                    <div>
+                        <label for="name" class="block font-bold" >{{ $t('description') }}</label>
+                        <Textarea id="name" v-model.trim="missedDescription" rows="5" :autoResize="true" required="true" autofocus :class="{ 'p-invalid': submitted && !missedDescription }" fluid />
                         <small class="p-invalid" v-if="submitted && !missedDescription">{{ $t('description_alert') }}</small>
                     </div>
-                    <template #footer>
-                        <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
-                        <Button :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="checkJustify" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product"
-                            >Are you sure you want to delete <b>{{ product.name }}</b
-                            >?</span
-                        >
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteProduct" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected products?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />
-                    </template>
-                </Dialog>
-            </div>
+                </div>
+                <template #footer>
+                    <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
+                    <Button :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="checkJustify" />
+                </template>
+            </Dialog>
         </div>
     </div>
 </template>

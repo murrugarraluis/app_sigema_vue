@@ -304,7 +304,7 @@ export default {
                     </template>
 
                     <template v-slot:end>
-                        <Button :label="$t('new_attendance_comtrol')" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                        <Button :label="$t('new_attendance_comtrol')" icon="pi pi-plus" class="mr-2" @click="openNew" />
                     </template>
                 </Toolbar>
                 <DataTable
@@ -432,7 +432,7 @@ export default {
                             </template>
                         </PickList>
                         <div class="mt-4 flex justify-end">
-                            <Button :label="$t('create')" icon="pi pi-list" class="p-button-success mr-2" @click="confirmCreateAttendanceSheet" />
+                            <Button :label="$t('create')" icon="pi pi-list" class="mr-2" @click="confirmCreateAttendanceSheet" />
                         </div>
                     </div>
                 </div>

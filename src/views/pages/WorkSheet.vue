@@ -401,7 +401,7 @@ export default {
                     </template>
 
                     <template v-slot:end>
-                        <Button :label="$t('new_work')" icon="pi pi-cog" class="p-button-success mr-2" @click="nextPage" />
+                        <Button :label="$t('new_work')" icon="pi pi-cog" class="mr-2" @click="nextPage" />
                     </template>
                 </Toolbar>
 

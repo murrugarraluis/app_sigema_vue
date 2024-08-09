@@ -257,7 +257,7 @@ export default {
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
-                            <Button :label="$t('new')" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                            <Button :label="$t('new')" icon="pi pi-plus" class="mr-2" @click="openNew" />
                         </div>
                     </template>
 

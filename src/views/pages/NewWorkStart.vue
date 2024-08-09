@@ -384,7 +384,7 @@ export default {
                     </div>
                     <div class="col-12 grid">
                         <div v-if="workSheet.is_open && !workSheet.id" class="col-6">
-                            <Button icon="pi pi-play" @click="startWork()" :label="$t('start')" class="p-button-success mr-2" />
+                            <Button icon="pi pi-play" @click="startWork()" :label="$t('start')" class="mr-2" />
                         </div>
                         <div v-if="workSheet.is_open && !workSheet.is_pause && workSheet.id" class="col-6">
                             <Button icon="pi pi-pause" @click="pauseWork()" :label="$t('pause')" class="p-button-warning mr-2" />

@@ -410,7 +410,7 @@ export default {
                     </template>
 
                     <template v-slot:end>
-                        <Button :label="$t('new_maintenance')" icon="pi pi-sliders-h" class="p-button-success mr-2" @click="nextPage" />
+                        <Button :label="$t('new_maintenance')" icon="pi pi-sliders-h" class="mr-2" @click="nextPage" />
                         <!--@click="exportCSV($event)"-->
                     </template>
                 </Toolbar>
