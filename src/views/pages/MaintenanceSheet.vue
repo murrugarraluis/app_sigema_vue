@@ -62,7 +62,8 @@ export default {
             isView: false,
             start_date: moment().format('YYYY-MM-DD'),
             end_date: moment().format('YYYY-MM-DD'),
-            minDateValue: new Date()
+            minDateValue: new Date(),
+            loadingPDFs: {} // Objeto para manejar el estado de carga de cada botón
         };
     },
     workSheetService: null,
@@ -348,20 +349,18 @@ export default {
         },
         getImage(path) {
             // console.log(path)
-            return `${process.env.VUE_APP_API_HOST}/storage/${path}`;
+            return `${import.meta.env.VITE_APP_API_HOST}/storage/${path}`;
         },
         getPDF(data) {
+            this.loadingPDFs = { ...this.loadingPDFs, [data.id]: true };
             this.maintenenaceSheetService.reportOne(data.id).then((data) => {
-                // console.log(data)
+                this.loadingPDFs = {};
                 this.viewPDF(data.path);
-                // this.loadingMachines = false;
             });
         },
         viewPDF(path) {
-            // console.log(data)
-            let uri = `${process.env.VUE_APP_API_HOST}/storage/${path}`;
+            let uri = `${import.meta.env.VITE_APP_API_HOST}/storage/${path}`;
             window.open(uri);
-            // return `${process.env.VUE_APP_API_HOST}/storage/${path}`;
         },
         initFilters() {
             this.filters = {
@@ -384,34 +383,25 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
-        <div class="col-12">
-            <div class="card p-fluid">
-                <div class="flex flex-column align-items-center">
-                    <h3 class="text-900 font-medium">{{ $t('maintenance_sheets') }}</h3>
-                </div>
-            </div>
-        </div>
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
-                        <div class="fiel grid">
-                            <div style="vertical-align: inherit" class="px-2">
-                                <label for="name1">{{ $t('from_the') }}</label>
-                                <Calendar :showIcon="true" :showButtonBar="false" v-model="start_date" :maxDate="minDateValue" dateFormat="yy-mm-dd"></Calendar>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex justify-center items-center gap-2">
+                                <label class="block font-bold">{{ $t('from_the') }}:</label>
+                                <DatePicker :showIcon="true" v-model="start_date" :maxDate="minDateValue" dateFormat="yy-mm-dd" fluid></DatePicker>
                             </div>
-                            <div style="vertical-align: inherit" class="px-2">
-                                <label for="name1">{{ $t('until_the') }}</label>
-                                <Calendar :showIcon="true" :showButtonBar="false" v-model="end_date" :maxDate="minDateValue" dateFormat="yy-mm-dd"></Calendar>
+                            <div class="flex justify-center items-center gap-2">
+                                <label class="block font-bold">{{ $t('until_the') }}:</label>
+                                <DatePicker :showIcon="true" v-model="end_date" :maxDate="minDateValue" dateFormat="yy-mm-dd" fluid></DatePicker>
                             </div>
                         </div>
                     </template>
 
                     <template v-slot:end>
                         <Button :label="$t('new_maintenance')" icon="pi pi-sliders-h" class="mr-2" @click="nextPage" />
-                        <!--@click="exportCSV($event)"-->
                     </template>
                 </Toolbar>
 
@@ -430,75 +420,53 @@ export default {
                     :loading="loadingMachines"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('list_maintenance_sheets') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('list_maintenance_sheets') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
 
-                    <Column field="code" :header="$t('code')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="code" :header="$t('code')" :sortable="true" headerStyle="width:20%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Code</span>
                             {{ slotProps.data.code }}
                         </template>
                     </Column>
 
-                    <Column field="date" :header="$t('date')" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                    <Column field="date" :header="$t('date')" :sortable="true" headerStyle="width:20%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Date</span>
                             {{ slotProps.data.date }}
                         </template>
                     </Column>
 
                     <Column field="machine.name" :header="$t('machine')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Machine</span>
                             {{ slotProps.data.machine.name }}
-                        </template>
-                    </Column>
-
-                    <Column field="machine.model" :header="$t('model')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Model</span>
-                            {{ slotProps.data.machine.model }}
-                        </template>
-                    </Column>
-
-                    <Column field="machine.brand" :header="$t('brand')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Brand</span>
-                            {{ slotProps.data.machine.brand }}
                         </template>
                     </Column>
 
                     <Column :header="$t('image')" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Image</span>
                             <img :src="slotProps.data.machine.image ? getImage(slotProps.data.machine.image) : imageDefault" :alt="'machine'" class="shadow-2" width="100" height="100" />
                         </template>
                     </Column>
 
                     <Column field="maintenance_type.name" :header="$t('maintenance_type')" :sortable="true" headerStyle="width:14%; min-width:9rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Maintenance Type</span>
                             {{ slotProps.data.maintenance_type.name }}
                         </template>
                     </Column>
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" @click="viewMachine(slotProps.data)" />
-                                <Button icon="pi pi-file-pdf" class="p-button-rounded p-button-success mr-2" @click="getPDF(slotProps.data)" />
-                                <!--<Button
-                  icon="pi pi-pencil"
-                  class="p-button-rounded p-button-warning mr-2"
-                  @click="editProduct(slotProps.data)"
-                />-->
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="confirmDelete(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewMachine(slotProps.data)" />
+                                <Button outlined rounded severity="warn" icon="pi pi-file-pdf" class="mr-2" :loading="loadingPDFs[slotProps.data.id]" @click="getPDF(slotProps.data)" />
+                                <Button outlined rounded severity="danger" icon="pi pi-trash" class="" @click="confirmDelete(slotProps.data)" />
                             </div>
                         </template>
                     </Column>
@@ -513,19 +481,8 @@ export default {
                         >
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected products?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
+                        <Button label="No" icon="pi pi-times" class="" severity="secondary" outlined @click="deleteDialog = false" />
+                        <Button :label="$t('yes')" icon="pi pi-check" class="" severity="danger" @click="deleteResource" />
                     </template>
                 </Dialog>
             </div>

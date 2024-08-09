@@ -358,7 +358,6 @@ export default {
                             <div class="flex justify-end items-center">
                                 <Button v-if="!slotProps.data.is_open" outlined rounded severity="info" icon="pi pi-eye" @click="editProduct(slotProps.data)" />
                                 <Button v-if="slotProps.data.is_open" outlined rounded severity="warn" icon="pi pi-pencil" @click="editProduct(slotProps.data)" />
-
                             </div>
                         </template>
                     </Column>
