@@ -286,28 +286,19 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
-        <div class="col-12">
-            <div class="card p-fluid">
-                <div class="flex flex-column align-items-center">
-                    <h3 class="text-900 font-medium">{{ $t('attendances') }}</h3>
-                </div>
-            </div>
-        </div>
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
-                        <div class="fiel grid">
-                            <div style="vertical-align: inherit" class="px-2">
-                                <label>{{ $t('from_the') }}</label>
-
-                                <Calendar :showIcon="true" :showButtonBar="false" v-model="start_date" :maxDate="minDateValue" dateFormat="yy-mm-dd"></Calendar>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex justify-center items-center gap-2">
+                                <label class="block font-bold">{{ $t('from_the') }}:</label>
+                                <DatePicker :showIcon="true" v-model="start_date" :maxDate="minDateValue" dateFormat="yy-mm-dd" fluid></DatePicker>
                             </div>
-                            <div style="vertical-align: inherit" class="px-2">
-                                <label>{{ $t('until_the') }}</label>
-                                <Calendar :showIcon="true" :showButtonBar="false" v-model="end_date" :maxDate="minDateValue" dateFormat="yy-mm-dd"></Calendar>
+                            <div class="flex justify-center items-center gap-2">
+                                <label class="block font-bold">{{ $t('until_the') }}:</label>
+                                <DatePicker :showIcon="true" v-model="end_date" :maxDate="minDateValue" dateFormat="yy-mm-dd" fluid></DatePicker>
                             </div>
                         </div>
                     </template>
@@ -316,7 +307,6 @@ export default {
                         <Button :label="$t('new_attendance_comtrol')" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
                     </template>
                 </Toolbar>
-
                 <DataTable
                     ref="dt"
                     :value="sheetsAttendances"
@@ -332,176 +322,135 @@ export default {
                     :loading="loadingSheets"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('list_attendance_sheets') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('list_attendance_sheets') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
-                    <Column field="date" :header="$t('date')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="date" :header="$t('date')" :sortable="true" headerStyle="width:20%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Date</span>
                             {{ slotProps.data.date }}
                         </template>
                     </Column>
-                    <Column field="responsible" :header="$t('responsible')" :sortable="true" headerStyle="width:20%; min-width:10rem;">
+                    <Column field="responsible" :header="$t('responsible')" :sortable="true" headerStyle="width:40%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Responsible</span>
                             {{ slotProps.data.responsible }}
                         </template>
                     </Column>
                     <Column field="turn" :header="$t('turn')" :sortable="true" headerStyle="width:3%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Turn</span>
                             {{ $t(slotProps.data.turn) }}
                         </template>
                     </Column>
                     <Column field="is_open" :header="$t('status')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
-
-                            <span :class="'product-badge status-' + (slotProps.data.is_open === 1 ? 'instock' : 'outofstock')">{{ slotProps.data.is_open ? 'Open' : 'Closed' }}</span>
+                            <Tag :value="slotProps.data.is_open ? 'Open' : 'Closed'" :severity="slotProps.data.is_open === 1 ? 'success' : 'danger'" />
                         </template>
                     </Column>
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button v-if="!slotProps.data.is_open" icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" @click="editProduct(slotProps.data)" />
-                                <Button v-if="slotProps.data.is_open" icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2" @click="editProduct(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button v-if="!slotProps.data.is_open" outlined rounded severity="info" icon="pi pi-eye" @click="editProduct(slotProps.data)" />
+                                <Button v-if="slotProps.data.is_open" outlined rounded severity="warn" icon="pi pi-pencil" @click="editProduct(slotProps.data)" />
+
                             </div>
                         </template>
                     </Column>
                 </DataTable>
+            </div>
 
-                <Dialog v-model:visible="productDialog" :style="{ width: '1300px' }">
-                    <div class="content-section introduction">
-                        <div class="feature-intro">
-                            <h5>{{ $t('pick_list_new_attendance') }}</h5>
+            <Dialog v-model:visible="productDialog" :style="{ width: '1300px' }">
+                <div class="content-section implementation">
+                    <div class="card">
+                        <div class="mb-4">
+                            <h5 class="block text-xl font-bold mb-4">{{ $t('pick_list_new_attendance') }}</h5>
                             <h6>{{ $t('description_pick_list_new_attendance') }}</h6>
                         </div>
-                        <AppDemoActions />
-                    </div>
-
-                    <div class="content-section implementation">
-                        <div class="card">
-                            <PickList v-model="employees" listStyle="height:342px" dataKey="id" :showSourceControls="false" :showTargetControls="false">
-                                <template #sourceheader>
-                                    {{ $t('availables') }}
-                                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                                        <div class="field grid col-8">
-                                            <div style="vertical-align: inherit" class="px-2">
-                                                <label>{{ $t('type') }}</label>
-
-                                                <Dropdown id="state" v-model="typeItem" :options="employeeTypes" optionLabel="name" placeholder="Type employee" :filter="false" @change="filterByType"></Dropdown>
-                                            </div>
-
-                                            <div style="vertical-align: inherit" class="px-2">
-                                                <label>{{ $t('turn') }}</label>
-
-                                                <Dropdown id="state" v-model="turnItem" :options="employeeTurns" optionLabel="name" placeholder="Turn" :filter="false" @change="filterByTurn"></Dropdown>
-                                            </div>
-                                        </div>
-
-                                        <div class="field col-4">
-                                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                        <PickList v-model="employees" listStyle="height:342px" dataKey="id" :showSourceControls="false" :showTargetControls="false">
+                            <template #sourceheader>
+                                <h6 class="block text-lg font-bold mb-4">{{ $t('availables') }}</h6>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="col-span-1">
+                                        <label class="block">{{ $t('type') }}</label>
+                                        <Dropdown id="state" v-model="typeItem" :options="employeeTypes" optionLabel="name" placeholder="Type employee" :filter="false" @change="filterByType" fluid ></Dropdown>
+                                    </div>
+                                    <div class="col-span-1">
+                                        <label class="block">{{ $t('turn') }}</label>
+                                        <Dropdown id="state" v-model="turnItem" :options="employeeTurns" optionLabel="name" placeholder="Turn" :filter="false" @change="filterByTurn" fluid ></Dropdown>
+                                    </div>
+                                    <div class="col-span-1 sm:col-span-2">
+                                        <IconField>
+                                            <InputIcon>
                                                 <i class="pi pi-search" />
-                                                <InputText style="width: 150px" v-model="searchEmployee" :placeholder="$t('search')" />
-                                            </span>
-                                        </div>
+                                            </InputIcon>
+                                            <InputText v-model="searchEmployee" :placeholder="$t('search')" fluid />
+                                        </IconField>
                                     </div>
-                                </template>
-                                <template #targetheader>
-                                    {{ $t('selected') }}
+                                </div>
+                            </template>
+                            <template #targetheader>
+                                <h6 class="block text-lg font-bold mb-4">{{ $t('selected') }}</h6>
+                                <div>
+                                    <label class="block">{{ $t('selected_turn') }}</label>
+                                    <Dropdown id="state" v-model="attendanceTurnItem" :options="attendanceTurn" optionLabel="name" :filter="false" fluid></Dropdown>
+                                </div>
+                            </template>
 
-                                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                                        <div class="field grid col-12">
-                                            <div style="vertical-align: inherit" class="px-2">
-                                                <i>{{ $t('selected_turn') }}</i>
-
-                                                <Dropdown id="state" v-model="attendanceTurnItem" :options="attendanceTurn" optionLabel="name" :filter="false"></Dropdown>
+                            <template #item="slotProps">
+                                <div class="product-item">
+                                    <div class="product-list-detail">
+                                        <div class="grid">
+                                            <div class="col 6">
+                                                <h6 class="mb-2">
+                                                    {{ slotProps.item.name + ' ' + slotProps.item.lastname }}
+                                                </h6>
+                                            </div>
+                                            <div class="col 2">
+                                                <h6 class="mb-2">
+                                                    {{ slotProps.item.document_number }}
+                                                </h6>
+                                            </div>
+                                            <div class="col 2">
+                                                <h6 class="mb-2">
+                                                    {{ slotProps.item.type }}
+                                                </h6>
+                                            </div>
+                                            <div class="col 2">
+                                                <h6 class="mb-2">
+                                                    {{ slotProps.item.turn }}
+                                                </h6>
                                             </div>
                                         </div>
                                     </div>
-                                </template>
-
-                                <template #item="slotProps">
-                                    <div class="product-item">
-                                        <div class="product-list-detail">
-                                            <div class="grid">
-                                                <div class="col 6">
-                                                    <h6 class="mb-2">
-                                                        {{ slotProps.item.name + ' ' + slotProps.item.lastname }}
-                                                    </h6>
-                                                </div>
-                                                <div class="col 2">
-                                                    <h6 class="mb-2">
-                                                        {{ slotProps.item.document_number }}
-                                                    </h6>
-                                                </div>
-                                                <div class="col 2">
-                                                    <h6 class="mb-2">
-                                                        {{ slotProps.item.type }}
-                                                    </h6>
-                                                </div>
-                                                <div class="col 2">
-                                                    <h6 class="mb-2">
-                                                        {{ slotProps.item.turn }}
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </template>
-                            </PickList>
-                        </div>
-                        <div class="flex justify-content-end">
+                                </div>
+                            </template>
+                        </PickList>
+                        <div class="mt-4 flex justify-end">
                             <Button :label="$t('create')" icon="pi pi-list" class="p-button-success mr-2" @click="confirmCreateAttendanceSheet" />
                         </div>
                     </div>
-                </Dialog>
-                <Dialog v-model:visible="confirmCreateAttendacneSheetDialog" :style="{ width: '450px' }" :header="$t('create_alert_title')" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="attendanceSheet">{{ $t('create_alert_question') }}</span>
-                    </div>
-                    <br />
-                    <small
-                        ><b>{{ $t('create_alert_note') }}</b> {{ $t('create_alert_note_complete') }}</small
-                    >
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="confirmCreateAttendacneSheetDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="nextPage" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="attendanceSheet"
-                            >Are you sure you want to delete <b>{{ attendanceSheet.name }}</b
-                            >?</span
-                        >
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected products?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />
-                    </template>
-                </Dialog>
-            </div>
+                </div>
+            </Dialog>
+            <Dialog v-model:visible="confirmCreateAttendacneSheetDialog" :style="{ width: '450px' }" :header="$t('create_alert_title')" :modal="true">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                    <span v-if="attendanceSheet">{{ $t('create_alert_question') }}</span>
+                </div>
+                <br />
+                <small
+                    ><b>{{ $t('create_alert_note') }}</b> {{ $t('create_alert_note_complete') }}</small
+                >
+                <template #footer>
+                    <Button label="No" icon="pi pi-times" class="p-button-text" @click="confirmCreateAttendacneSheetDialog = false" />
+                    <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="nextPage" />
+                </template>
+            </Dialog>
         </div>
     </div>
 </template>
