@@ -63,6 +63,9 @@
             font-size: 1rem;
             display: none;
         }
+        #notificationBadge > span{
+            display: block;
+        }
 
         &.layout-topbar-action-highlight {
             background-color: var(--primary-color);
@@ -97,6 +100,12 @@
         display: flex;
         gap: 1rem;
     }
+}
+.p-popover:after {
+    content: none !important;
+}
+.p-popover:before {
+    content: none !important;
 }
 
 @media (max-width: 991px) {

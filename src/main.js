@@ -12,7 +12,10 @@ import '@/assets/tailwind.css';
 import i18n from '@/locales/i18n';
 
 const app = createApp(App);
-
+const pusherOptions = {
+    apiKey: import.meta.env.VITE_APP_PUSHER_KEY,
+    cluster: import.meta.env.VITE_APP_PUSHER_CLUSTER
+};
 app.use(router);
 app.use(PrimeVue, {
     theme: {

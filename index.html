@@ -13,5 +13,12 @@
       <div id="app"></div>
       <script type="module" src="/src/main.js"></script>
 </body>
-
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+<script>
+    // Enable pusher logging - don't include this in production
+    // Pusher.logToConsole = true;
+    var pusher = new Pusher('74a129997f78ebbd00fc', {
+        cluster: 'us2'
+    });
+</script>
 </html>

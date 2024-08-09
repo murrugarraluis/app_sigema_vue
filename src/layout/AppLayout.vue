@@ -4,9 +4,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppTopbar from './AppTopbar.vue';
-import i18n from '@/locales/i18n';
 import { useI18n } from 'vue-i18n';
-
 const { layoutConfig, layoutState, isSidebarActive, resetMenu } = useLayout();
 
 const outsideClickListener = ref(null);
@@ -63,8 +61,11 @@ const setLenguaje = () => {
 const switchLanguage = (lang) => {
     locale.value = lang;
 };
+const startPusher = () => {
+};
 onMounted(() => {
     setLenguaje();
+    startPusher();
 });
 </script>
 

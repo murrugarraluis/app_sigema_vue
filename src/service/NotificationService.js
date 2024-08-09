@@ -1,14 +1,14 @@
-import HttpService from "./HttpService";
+import HttpService from './HttpService';
 
-const uri = 'notifications'
+const uri = 'notifications';
 export default class NotificationService {
     async getAll() {
-        return HttpService.prototype.getAll(uri)
+        return HttpService.prototype.getAll(uri);
     }
 
     async check() {
-        let custom_uri = uri + '/check'
-        return HttpService.prototype.getAll(custom_uri)
+        let custom_uri = uri + '/check';
+        return HttpService.prototype.getAll(custom_uri);
     }
 
     // async getAllSparePart() {
