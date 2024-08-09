@@ -309,21 +309,22 @@ export default {
 
 <template>
     <Toast />
-    <div class="grid">
-        <div class="col-12">
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12">
             <Button icon="pi pi-arrow-left" class="p-button-rounded mr-2 mb-2" @click="backPage" />
             <div class="card p-fluid">
-                <div class="flex flex-column align-items-center">
-                    <h3 class="text-900 font-medium">{{ $t('operation_control') }}</h3>
-                    <Button :label="$t('select_machine_btn')" class="p-button-secondary mr-2 mb-2" @click="openNew" :disabled="!workSheet.is_open || workSheet.id" />
+                <div class="flex flex-col items-start justify-center">
+                    <h3 class="text-900 font-bold text-primary">{{ $t('operation_control') }}</h3>
                 </div>
             </div>
         </div>
-        <div class="col-12 md:col-6">
+        <div class="col-span-12 md:col-span-6">
             <div class="card p-fluid h-full">
-                <div class="grid">
+                <div class="flex flex-col gap-4">
+                    <h5 class="text-lg font-bold">{{ $t('machine_data') }}</h5>
+                    <Button :label="$t('select_machine_btn')" class="mr-2 mb-2" @click="openNew"
+                            :disabled="!workSheet.is_open || workSheet.id" />
                     <div class="col-6">
-                        <h5>{{ $t('machine_data') }}</h5>
                         <div class="grid">
                             <div class="field col-12">
                                 <b>> {{ $t('serial_number') }}: </b>
@@ -347,85 +348,99 @@ export default {
                             </div>
                             <div class="field col-12">
                                 <b>> {{ $t('total_acumulate') }}: </b>
-                                <i>
-                                    {{ this.workSheet.machine.total_time_used.hours }} hrs {{ this.workSheet.machine.total_time_used.minutes }} min
+                                <span v-if="this.workSheet.machine.total_time_used.hours">
+                                    {{ this.workSheet.machine.total_time_used.hours
+                                    }} hrs {{ this.workSheet.machine.total_time_used.minutes }} min
                                     {{ this.workSheet.machine.total_time_used.seconds }}
                                     sec
-                                    <b>/ {{ this.workSheet.machine.maximum_working_time }} hrs</b></i
+                                    <b>/ {{ this.workSheet.machine.maximum_working_time }} hrs</b></span
                                 >
                             </div>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="grid h-full">
-                            <div class="field col-12 flex justify-content-center align-items-center">
-                                <img :src="this.workSheet.machine.image ? getImage(this.workSheet.machine.image) : imageDefault" :alt="'machine'" class="shadow-2" width="180" height="200" />
+                            <div class="flex justify-center items-center">
+                                <img
+                                    :src="this.workSheet.machine.image ? getImage(this.workSheet.machine.image) : imageDefault"
+                                    :alt="'machine'" class="shadow-2" width="180" height="200" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 md:col-6">
+        <div class="col-span-12 md:col-span-6">
             <div class="card p-fluid h-full">
-                <h5>{{ $t('precheck_description') }}</h5>
-                <div class="field">
-                    <!--          <label for="name1">Description</label>-->
-                    <Textarea id="description" v-model.trim="workSheet.description" :placeholder="$t('your_message_precheck')" :autoResize="true" rows="10" cols="30" :disabled="workSheet.id" />
+                <div class="flex flex-col gap-4">
+                    <h5 class="text-lg font-bold">{{ $t('precheck_description') }}</h5>
+                    <div class="field">
+                        <Textarea id="description" v-model.trim="workSheet.description"
+                                  :placeholder="$t('your_message_precheck')" :autoResize="true" rows="15" cols="30"
+                                  :disabled="workSheet.id" fluid />
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-12">
+        <div class="col-span-12">
             <div class="card p-fluid">
-                <h5 style="text-align: center">{{ $t('operation') }}</h5>
+                <h5 class="text-lg font-bold text-center">{{ $t('operation') }}</h5>
 
-                <div class="grid">
-                    <div class="col-12 text-center">
+                <div class="flex flex-col gap-4">
+                    <div class="text-center">
                         <p class="font-bold text-4xl pt-4 pb-4">{{ workSheet.working_hours_total }}</p>
                     </div>
-                    <div class="col-12 grid">
-                        <div v-if="workSheet.is_open && !workSheet.id" class="col-6">
-                            <Button icon="pi pi-play" @click="startWork()" :label="$t('start')" class="mr-2" />
+                    <div class="flex flex-row gap-4 mx-auto">
+                        <div v-if="workSheet.is_open && !workSheet.id">
+                            <Button icon="pi pi-play" @click="startWork()" :label="$t('start')" class=""
+                                    severity="success" />
                         </div>
-                        <div v-if="workSheet.is_open && !workSheet.is_pause && workSheet.id" class="col-6">
-                            <Button icon="pi pi-pause" @click="pauseWork()" :label="$t('pause')" class="p-button-warning mr-2" />
+                        <div v-if="workSheet.is_open && !workSheet.is_pause && workSheet.id">
+                            <Button icon="pi pi-pause" @click="pauseWork()" :label="$t('pause')" severity="warn"
+                                    class="" />
                         </div>
 
-                        <div v-if="workSheet.is_open && workSheet.is_pause && workSheet.id" class="col-6">
-                            <Button icon="pi pi-reply" @click="restartWork()" :label="$t('restart')" class="p-button-success" />
+                        <div v-if="workSheet.is_open && workSheet.is_pause && workSheet.id">
+                            <Button icon="pi pi-reply" @click="restartWork()" :label="$t('restart')"
+                                    severity="success" />
                         </div>
-                        <div v-if="workSheet.is_open" class="col-6">
-                            <Button icon="pi pi-stop" @click="stopWork()" :label="$t('stop')" class="p-button-danger" :disabled="!workSheet.id" />
+                        <div v-if="workSheet.is_open">
+                            <Button icon="pi pi-stop" @click="stopWork()" :label="$t('stop')" class="p-button-danger"
+                                    :disabled="!workSheet.id" />
                         </div>
                     </div>
 
-                    <div class="col-12">
-                        <DataTable ref="dt" :value="workSheet.working_hours" dataKey="id" :paginator="false" :rows="10" :filters="filters" responsiveLayout="scroll">
+                    <div class="">
+                        <DataTable ref="dt" :value="workSheet.working_hours" dataKey="id" :paginator="false" :rows="10"
+                                   :filters="filters" responsiveLayout="scroll">
                             <template #header>
-                                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                                    <h5 class="m-0">{{ $t('times') }}</h5>
-                                    <span class="block mt-2 md:mt-0 p-input-icon-left"> </span>
+                                <div
+                                    class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                    <h5 class="text-lg font-bold">{{ $t('times') }}</h5>
                                 </div>
                             </template>
 
                             <Column headerStyle="width: 3rem"></Column>
 
-                            <Column field="date_time_start" :header="$t('date_time_start')" headerStyle="width:45%; min-width:10rem;">
+                            <Column field="date_time_start" :header="$t('date_time_start')"
+                                    headerStyle="width:45%; min-width:10rem;">
                                 <template #body="slotProps">
                                     {{ slotProps.data.date_time_start }}
                                 </template>
                             </Column>
 
-                            <Column field="date_time_end" :header="$t('date_time_end')" headerStyle="width:45%; min-width:10rem;">
+                            <Column field="date_time_end" :header="$t('date_time_end')"
+                                    headerStyle="width:45%; min-width:10rem;">
                                 <template #body="slotProps">
                                     {{ slotProps.data.date_time_end }}
                                 </template>
                             </Column>
 
-                            <Column field="date_time_diff" :header="$t('cumulative_hours')" headerStyle="width:45%; min-width:10rem;">
+                            <Column field="date_time_diff" :header="$t('cumulative_hours')"
+                                    headerStyle="width:45%; min-width:10rem;">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.date_time_diff.hours + ':' + slotProps.data.date_time_diff.minutes + ':' + slotProps.data.date_time_diff.secons + '' }}
+                                    {{ slotProps.data.date_time_diff.hours + ':' + slotProps.data.date_time_diff.minutes + ':' + slotProps.data.date_time_diff.secons + ''
+                                    }}
                                 </template>
                             </Column>
                         </DataTable>
@@ -434,7 +449,8 @@ export default {
             </div>
         </div>
     </div>
-    <Dialog v-model:visible="productDialog" :breakpoints="{ '960px': '75vw', '640px': '100vw' }" :style="{ width: '45vw' }" :header="$t('select_machine')" :modal="true" class="p-fluid">
+    <Dialog v-model:visible="productDialog" :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
+            :style="{ width: '45vw' }" :header="$t('select_machine')" :modal="true" class="p-fluid">
         <DataTable
             ref="dt"
             :value="machines"
@@ -449,80 +465,47 @@ export default {
             :loading="loadingMachines"
         >
             <template #header>
-                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                    <h5 class="m-0">{{ $t('machines') }}</h5>
-                    <div class="align right">
-                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <div class="flex flex-wrap gap-2 items-center justify-between">
+                    <h5 class="font-bold text-xl text-primary m-0">{{ $t('machines') }}</h5>
+                    <IconField>
+                        <InputIcon>
                             <i class="pi pi-search" />
-                            <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                        </span>
-                    </div>
+                        </InputIcon>
+                        <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
+                    </IconField>
                 </div>
             </template>
-            <Column field="serie_number" :header="$t('serial_number')" :sortable="true" headerStyle="width:25%; min-width:10rem;">
+            <Column field="serie_number" :header="$t('serial_number')" :sortable="true"
+                    headerStyle="width:25%; min-width:10rem;">
                 <template #body="slotProps">
-                    <span class="p-column-title">Serie Number</span>
                     {{ slotProps.data.serie_number }}
                 </template>
             </Column>
             <Column field="name" :header="$t('name')" :sortable="true" headerStyle="width30%; min-width:10rem;">
                 <template #body="slotProps">
-                    <span class="p-column-title">Name</span>
                     {{ slotProps.data.name }}
                 </template>
             </Column>
-
-            <!--        <Column-->
-            <!--            field="model"-->
-            <!--            header="Model"-->
-            <!--            :sortable="true"-->
-            <!--            headerStyle="width:14%; min-width:10rem;"-->
-            <!--        >-->
-            <!--          <template #body="slotProps">-->
-            <!--            <span class="p-column-title">Model</span>-->
-            <!--            {{ slotProps.data.model }}-->
-            <!--          </template>-->
-            <!--        </Column>-->
-
-            <!--        <Column-->
-            <!--            field="brand"-->
-            <!--            header="Brand"-->
-            <!--            :sortable="true"-->
-            <!--            headerStyle="width:14%; min-width:10rem;"-->
-            <!--        >-->
-            <!--          <template #body="slotProps">-->
-            <!--            <span class="p-column-title">Brand</span>-->
-            <!--            {{ slotProps.data.brand }}-->
-            <!--          </template>-->
-            <!--        </Column>-->
-
             <Column :header="$t('image')" headerStyle="width:14%; min-width:10rem;">
                 <template #body="slotProps">
-                    <span class="p-column-title">Image</span>
-                    <img :src="slotProps.data.image ? getImage(slotProps.data.image) : imageDefault" :alt="'machine'" class="shadow-2" width="100" height="100" />
+                    <img :src="slotProps.data.image ? getImage(slotProps.data.image) : imageDefault" :alt="'machine'"
+                         class="shadow-2" width="100" height="100" />
                 </template>
             </Column>
             <Column field="status" :header="$t('status')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                 <template #body="slotProps">
-                    <span class="p-column-title">Status</span>
-                    <span :class="'product-badge status-' + (slotProps.data.status === 'available' ? 'new' : slotProps.data.status === 'operating' ? 'instock' : 'outofstock')">{{ $t(slotProps.data.status) }}</span>
+                    <Tag :value="$t(slotProps.data.status)"
+                         :severity="(slotProps.data.status === 'available' ? 'success' : slotProps.data.status === 'operating' ? 'warn' : 'danger')"
+                    ></Tag>
                 </template>
             </Column>
 
             <Column headerStyle="min-width:1rem;">
                 <template #body="slotProps">
                     <div style="display: flex; justify-content: end">
-                        <Button icon="pi pi-angle-double-down" class="p-button-rounded p-button-success mr-2" :disabled="slotProps.data.status === 'operating'" @click="selectMachine(slotProps.data)" />
-                        <!--              <Button-->
-                        <!--                  icon="pi pi-pencil"-->
-                        <!--                  class="p-button-rounded p-button-warning mr-2"-->
-                        <!--                  @click="editProduct(slotProps.data)"-->
-                        <!--              />-->
-                        <!--              <Button-->
-                        <!--                  icon="pi pi-trash"-->
-                        <!--                  class="p-button-rounded p-button-danger"-->
-                        <!--                  @click="confirmDelete(slotProps.data)"-->
-                        <!--              />-->
+                        <Button icon="pi pi-angle-double-down" class="p-button-rounded mr-2"
+                                :disabled="slotProps.data.status === 'operating'"
+                                @click="selectMachine(slotProps.data)" />
                     </div>
                 </template>
             </Column>
