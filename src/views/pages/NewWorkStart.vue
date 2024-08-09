@@ -196,8 +196,10 @@ export default {
             }
         },
         getImage(path) {
-            // console.log(path)
-            return `${process.env.VUE_APP_API_HOST}/storage/${path}`;
+            if (path.includes('http')) {
+                return path;
+            }
+            return `${import.meta.env.VITE_APP_API_HOST}/storage/${path}`;
         },
         isPositiveInteger(val) {
             let str = String(val);

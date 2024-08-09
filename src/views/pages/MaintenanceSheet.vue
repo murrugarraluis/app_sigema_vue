@@ -348,7 +348,9 @@ export default {
             this.machine.articles = this.machine.articles.filter((val) => val.id !== data.id);
         },
         getImage(path) {
-            // console.log(path)
+            if (path.includes('http')) {
+                return path;
+            }
             return `${import.meta.env.VITE_APP_API_HOST}/storage/${path}`;
         },
         getPDF(data) {
@@ -465,7 +467,7 @@ export default {
                         <template #body="slotProps">
                             <div class="flex justify-end items-center">
                                 <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewMachine(slotProps.data)" />
-                                <Button outlined rounded severity="warn" icon="pi pi-file-pdf" class="mr-2" :loading="loadingPDFs[slotProps.data.id]" @click="getPDF(slotProps.data)" />
+                                <Button outlined rounded severity="help" icon="pi pi-file-pdf" class="mr-2" :loading="loadingPDFs[slotProps.data.id]" @click="getPDF(slotProps.data)" />
                                 <Button outlined rounded severity="danger" icon="pi pi-trash" class="" @click="confirmDelete(slotProps.data)" />
                             </div>
                         </template>
