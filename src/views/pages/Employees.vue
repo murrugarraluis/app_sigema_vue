@@ -251,10 +251,9 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
+    <div>
         <div class="col-12">
             <div class="card">
-                <Toast />
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
@@ -282,122 +281,73 @@ export default {
                     :loading="loadingEmployees"
                 >
                     <template #header>
-                        <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ $t('employees') }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                        <div class="flex flex-wrap gap-2 items-center justify-between">
+                            <h5 class="font-bold text-xl text-primary m-0">{{ $t('employees') }}</h5>
+                            <IconField>
+                                <InputIcon>
+                                    <i class="pi pi-search" />
+                                </InputIcon>
                                 <InputText v-model="filters['global'].value" :placeholder="$t('search')" />
-                            </span>
+                            </IconField>
                         </div>
                     </template>
 
                     <Column field="name" :header="$t('names')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
                     <Column field="lastname" :header="$t('last_names')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Last Name</span>
                             {{ slotProps.data.lastname }}
                         </template>
                     </Column>
 
                     <Column field="document_type.name" :header="$t('document_type')" :sortable="true" headerStyle="width:5%; min-width:3rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Document Type</span>
                             {{ slotProps.data.document_type.name }}
                         </template>
                     </Column>
 
                     <Column field="document_number" :header="$t('document_number')" :sortable="true" headerStyle="width:8%; min-width:3rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Document Number</span>
                             {{ slotProps.data.document_number }}
                         </template>
                     </Column>
 
-                    <!--          <Column-->
-                    <!--              field="age"-->
-                    <!--              header="Age"-->
-                    <!--              :sortable="true"-->
-                    <!--              headerStyle="width:14%; min-width:10rem;"-->
-                    <!--          >-->
-                    <!--            <template #body="slotProps">-->
-                    <!--              <span class="p-column-title">Age</span>-->
-                    <!--              {{ slotProps.data.age }}-->
-                    <!--            </template>-->
-                    <!--          </Column>-->
-
                     <Column field="position.name" :header="$t('title')" :sortable="true" headerStyle="width:14%; min-width:9rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Title</span>
                             {{ slotProps.data.position.name }}
                         </template>
                     </Column>
 
                     <Column field="phone" :header="$t('telephone')" :sortable="true" headerStyle="width:10%; min-width:6rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Telephone</span>
                             {{ slotProps.data.phone }}
                         </template>
                     </Column>
 
                     <Column field="address" :header="$t('address')" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Address</span>
                             {{ slotProps.data.address }}
                         </template>
                     </Column>
-
-                    <!--<Column
-            field="personal_email"
-            header="Email"
-            :sortable="true"
-            headerStyle="width:14%; min-width:10rem;"
-          >
-            <template #body="slotProps">
-              <span class="p-column-title">Email</span>
-              {{ slotProps.data.personal_email }}
-            </template>
-          </Column>-->
-
-                    <!--          <Column-->
-                    <!--              field="inventoryStatus"-->
-                    <!--              header="Status"-->
-                    <!--              :sortable="true"-->
-                    <!--              headerStyle="width:14%; min-width:10rem;"-->
-                    <!--          >-->
-                    <!--            <template #body="slotProps">-->
-                    <!--              <span class="p-column-title">Status</span>-->
-                    <!--              <span-->
-                    <!--                  :class="-->
-                    <!--                  'product-badge status-' +-->
-                    <!--                  (slotProps.data.inventoryStatus-->
-                    <!--                    ? slotProps.data.inventoryStatus.toLowerCase()-->
-                    <!--                    : '')-->
-                    <!--                "-->
-                    <!--              >{{ slotProps.data.inventoryStatus }}</span-->
-                    <!--              >-->
-                    <!--            </template>-->
-                    <!--          </Column>-->
-
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <div style="display: flex; justify-content: end">
-                                <Button icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" @click="viewEmployee(slotProps.data)" />
-                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning mr-2" @click="editProduct(slotProps.data)" />
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="confirmDelete(slotProps.data)" />
+                            <div class="flex justify-end items-center">
+                                <Button outlined rounded severity="info" icon="pi pi-eye" class="mr-2" @click="viewEmployee(slotProps.data)" />
+                                <Button outlined rounded severity="warn" icon="pi pi-pencil" class="mr-2" @click="editProduct(slotProps.data)" />
+                                <Button outlined rounded severity="danger" icon="pi pi-trash" class="" @click="confirmDelete(slotProps.data)" />
                             </div>
                         </template>
                     </Column>
                 </DataTable>
-
-                <Dialog v-model:visible="productDialog" :style="{ width: '600px' }" :header="!employee.id ? $t('new_employee') : !isView ? $t('edit_employee') : $t('inf_employee')" :modal="true" class="p-fluid">
-                    <div class="formgrid grid">
+            </div>
+            <Dialog v-model:visible="productDialog" :style="{ width: '600px' }" :header="!employee.id ? $t('new_employee') : !isView ? $t('edit_employee') : $t('inf_employee')" :modal="true" class="p-fluid">
+                <div class="flex flex-col gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="field col">
-                            <label for="doccumentType">{{ $t('document_type') }}</label>
+                            <label for="doccumentType" class="block font-bold mb-3">{{ $t('document_type') }}</label>
                             <Dropdown
                                 id="doccumentType"
                                 v-model="employee.document_type"
@@ -409,13 +359,14 @@ export default {
                                 :class="{ 'p-invalid': submitted && !employee.document_type }"
                                 :disabled="isView"
                                 autocomplete="off"
+                                fluid
                             >
                             </Dropdown>
                             <small class="p-invalid" v-if="submitted && !employee.document_type">{{ $t('document_type_alert') }}</small>
                         </div>
 
                         <div class="field col">
-                            <label for="document_number">{{ $t('document_number') }}</label>
+                            <label for="document_number" class="block font-bold mb-3">{{ $t('document_number') }}</label>
                             <InputText
                                 id="document_number"
                                 v-model.trim="employee.document_number"
@@ -427,43 +378,29 @@ export default {
                                 :readonly="isView"
                                 autocomplete="off"
                                 @keypress="isNumber($event)"
+                                fluid
                             />
                             <small class="p-invalid" v-if="submitted && !employee.document_number">{{ $t('document_number_alert_one') }}</small>
                             <br />
                             <small class="p-invalid" v-if="submitted && employee.document_number && employee.document_number.length < 8">{{ $t('document_number_alert_two') }}</small>
                         </div>
                     </div>
-
-                    <div class="formgrid grid">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="field col">
-                            <label for="name">{{ $t('names') }}</label>
-                            <InputText id="name" v-model.trim="employee.name" required="true" autofocus :class="{ 'p-invalid': submitted && !employee.name }" :readonly="isView" autocomplete="off" />
+                            <label for="name" class="block font-bold mb-3">{{ $t('names') }}</label>
+                            <InputText id="name" v-model.trim="employee.name" required="true" autofocus :class="{ 'p-invalid': submitted && !employee.name }" :readonly="isView" autocomplete="off" fluid />
                             <small class="p-invalid" v-if="submitted && !employee.name">{{ $t('names_alert') }}</small>
                         </div>
 
                         <div class="field col">
-                            <label for="lastname">{{ $t('last_names') }}</label>
-                            <InputText id="name" v-model.trim="employee.lastname" required="true" autofocus :class="{ 'p-invalid': submitted && !employee.lastname }" :readonly="isView" autocomplete="off" />
+                            <label for="lastname" class="block font-bold mb-3">{{ $t('last_names') }}</label>
+                            <InputText id="name" v-model.trim="employee.lastname" required="true" autofocus :class="{ 'p-invalid': submitted && !employee.lastname }" :readonly="isView" autocomplete="off" fluid />
                             <small class="p-invalid" v-if="submitted && !employee.lastname">{{ $t('last_names_alert') }}</small>
                         </div>
                     </div>
-
-                    <div class="formgrid grid">
-                        <!--            <div class="field col-4">-->
-                        <!--              <label for="age">Age</label>-->
-                        <!--              &lt;!&ndash; <InputNumber id="age" v-model="product.quantity" integeronly />&ndash;&gt;-->
-                        <!--              <InputNumber-->
-                        <!--                id="age"-->
-                        <!--                v-model="inputNumberValue"-->
-                        <!--                showButtons-->
-                        <!--                :disabled="isView"-->
-                        <!--                :min="0"-->
-                        <!--                :useGrouping="false"-->
-                        <!--              />-->
-                        <!--            </div>-->
-
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="field col">
-                            <label for="position">{{ $t('title') }}</label>
+                            <label for="position" class="block font-bold mb-3">{{ $t('title') }}</label>
                             <Dropdown
                                 id="position"
                                 v-model="employee.position"
@@ -474,15 +411,13 @@ export default {
                                 :filter="false"
                                 :loading="false"
                                 :class="{ 'p-invalid': submitted && !employee.position }"
+                                fluid
                             >
                             </Dropdown>
                             <small class="p-invalid" v-if="submitted && !employee.position">{{ $t('title_alert') }}</small>
                         </div>
-                    </div>
-
-                    <div class="formgrid grid">
                         <div class="field col">
-                            <label for="phone">{{ $t('telephone') }}</label>
+                            <label for="phone" class="block font-bold mb-3">{{ $t('telephone') }}</label>
                             <InputText
                                 id="phone"
                                 v-model.trim="employee.phone"
@@ -494,13 +429,15 @@ export default {
                                 }"
                                 autocomplete="off"
                                 @keypress="isNumber($event)"
+                                fluid
                             />
                             <small class="p-invalid" v-if="submitted && !employee.phone">{{ $t('telephone_alert_one') }}</small>
                             <small class="p-invalid" v-if="submitted && employee.phone && employee.phone.length < 9">{{ $t('telephone_alert_two') }}</small>
                         </div>
-
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="field col">
-                            <label for="personal_email">{{ $t('email') }}</label>
+                            <label for="personal_email" class="block font-bold mb-3">{{ $t('email') }}</label>
                             <InputText
                                 id="personal_email"
                                 v-model.trim="employee.personal_email"
@@ -511,20 +448,20 @@ export default {
                                 }"
                                 :readonly="isView"
                                 autocomplete="off"
+                                fluid
                             />
                             <small class="p-invalid" v-if="submitted && !employee.personal_email">{{ $t('email_alert_one') }}</small>
                             <small class="p-invalid" v-if="submitted && employee.personal_email && !isEmail()">{{ $t('email_alert_two') }}</small>
                         </div>
+                        <div class="field">
+                            <label for="address" class="block font-bold mb-3">{{ $t('address') }}</label>
+                            <InputText id="address" v-model.trim="employee.address" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !employee.address }" fluid />
+                            <small class="p-invalid" v-if="submitted && !employee.address">{{ $t('address_alert') }}</small>
+                        </div>
                     </div>
-                    <div class="field">
-                        <label for="address">{{ $t('address') }}</label>
-                        <InputText id="address" v-model.trim="employee.address" required="true" autofocus :readonly="isView" :class="{ 'p-invalid': submitted && !employee.address }" />
-                        <small class="p-invalid" v-if="submitted && !employee.address">{{ $t('address_alert') }}</small>
-                    </div>
-
-                    <div class="formgrid grid">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="field col">
-                            <label for="state">{{ $t('native_lenguage') }}</label>
+                            <label for="state" class="block font-bold mb-3">{{ $t('native_lenguage') }}</label>
                             <Dropdown
                                 id="state"
                                 v-model="employee.native_language"
@@ -534,11 +471,12 @@ export default {
                                 optionValue="value"
                                 :placeholder="$t('select_one')"
                                 :class="{ 'p-invalid': submitted && !employee.native_language }"
+                                fluid
                             ></Dropdown>
                             <small class="p-invalid" v-if="submitted && !employee.native_language">{{ $t('native_lenguage_alert') }}</small>
                         </div>
                         <div class="field col">
-                            <label for="state">{{ $t('personal_type') }}</label>
+                            <label for="state" class="block font-bold mb-3">{{ $t('personal_type') }}</label>
                             <Dropdown
                                 id="state"
                                 v-model="employee.type"
@@ -548,11 +486,12 @@ export default {
                                 optionValue="value"
                                 :placeholder="$t('select_one')"
                                 :class="{ 'p-invalid': submitted && !employee.type }"
+                                fluid
                             ></Dropdown>
                             <small class="p-invalid" v-if="submitted && !employee.type">{{ $t('personal_type_alert') }}</small>
                         </div>
                         <div class="field col">
-                            <label for="state">{{ $t('work_shift') }}</label>
+                            <label for="state" class="block font-bold mb-3">{{ $t('work_shift') }}</label>
                             <Dropdown
                                 id="state"
                                 v-model="employee.turn"
@@ -562,42 +501,32 @@ export default {
                                 optionValue="value"
                                 :placeholder="$t('select_one')"
                                 :class="{ 'p-invalid': submitted && !employee.turn }"
+                                fluid
                             ></Dropdown>
                             <small class="p-invalid" v-if="submitted && !employee.turn">{{ $t('work_shift_alert') }}</small>
                         </div>
                     </div>
+                </div>
 
-                    <template #footer>
-                        <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
-                        <Button v-if="!isView" :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
-                    </template>
-                </Dialog>
+                <template #footer>
+                    <Button :label="$t('cancel')" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog" />
+                    <Button v-if="!isView" :label="$t('save')" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
+                </template>
+            </Dialog>
 
-                <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" :header="$t('confirm')" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="resource"
-                            >{{ $t('delete') }} <b>{{ resource.name }}</b
-                            >?</span
-                        >
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button :label="$t('yes')" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
-                    </template>
-                </Dialog>
-
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete the selected employees?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteResource" />
-                    </template>
-                </Dialog>
-            </div>
+            <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" :header="$t('confirm')" :modal="true">
+                <div class="flex align-items-center justify-content-center">
+                    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                    <span v-if="resource"
+                        >{{ $t('delete') }} <b>{{ resource.name }}</b
+                        >?</span
+                    >
+                </div>
+                <template #footer>
+                    <Button label="No" icon="pi pi-times" class="" severity="secondary" outlined @click="deleteDialog = false" />
+                    <Button :label="$t('yes')" icon="pi pi-check" class="" severity="danger" @click="deleteResource" />
+                </template>
+            </Dialog>
         </div>
     </div>
 </template>
